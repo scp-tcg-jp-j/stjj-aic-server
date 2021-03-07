@@ -1,6 +1,7 @@
 import { MainType, ObjectClass } from '../../../models/card';
 import { Request, Response } from 'express'
 import { upsertOne, bulkDelete } from '../../../models/services/cardCommandService'
+import { currentCards } from '../../../models/services/cardQueryService'
 import { validationResult, matchedData } from 'express-validator';
 
 // カード追加・カード更新（1枚）
@@ -31,7 +32,7 @@ export function postUpsertOne(req: Request, res: Response) {
     }
 
     // カード追加・カード更新の実行
-    upsertOne(card).then(()=>res.status(200).send()).catch(error=>res.status(500).json({ errors: error }).send())
+    upsertOne(card).then(() => res.status(200).send()).catch(error => res.status(500).json({ errors: error }).send())
 }
 
 // カード削除
@@ -47,5 +48,10 @@ export function postBulkDelete(req: Request, res: Response) {
     const raw = matchedData(req, { includeOptionals: true, locations: ['body'] })
 
     // カード削除の実行
-    bulkDelete(raw['deleteTargetCardPageids']).then((deletedCardsCount)=>res.status(200).send({ count: deletedCardsCount })).catch(error=>res.status(500).json({ errors: error }).send())
+    bulkDelete(raw['deleteTargetCardPageids']).then((deletedCardsCount)=>res.status(200).send({ count: deletedCardsCount })).catch(error => res.status(500).json({ errors: error }).send())
+}
+
+// DBに存在するカードの一覧を取得する（pageidとlatest_revidのペアだけ）
+export function getCurrentCards(req: Request, res: Response) {
+    currentCards().then((cards) => res.status(200).send(cards)).catch(error => res.status(500).json({ errors: error }).send())
 }
