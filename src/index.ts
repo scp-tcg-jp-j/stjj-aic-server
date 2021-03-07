@@ -14,8 +14,12 @@ if (process.argv.includes('--env=local')) {
     // bodyパーサ用ミドルウェア設定
     webApp.use(express.json())
     webApp.use(express.urlencoded({ extended: true }))
-    // 静的ファイルの場所（ローカル環境なのでフロントエンドもここから出してしまう）
-    // webApp.use(express.static('/var/www/stjj-aic-front/src'))
+    // CORS設定（ローカルなのでガバガバCORS設定でOK）
+    webApp.use(function(req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*')
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+        next()
+    })
     // ルータ生成
     const webRouter: express.Router = express.Router()
     // ルート設定
