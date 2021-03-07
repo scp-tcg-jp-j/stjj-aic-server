@@ -14,9 +14,9 @@ if (process.argv.includes('--env=local')) {
     // bodyパーサ用ミドルウェア設定
     webApp.use(express.json())
     webApp.use(express.urlencoded({ extended: true }))
-    // CORS設定（ローカルなのでガバガバCORS設定でOK）
+    // CORS設定
     webApp.use(function(req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*')
+        res.header('Access-Control-Allow-Origin', 'https://localhost:8080')
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
         next()
     })
