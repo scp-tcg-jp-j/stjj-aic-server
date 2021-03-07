@@ -23,7 +23,7 @@ export interface Card {
     effect?: string
     tags?: [string, ...string[]];
     banned?: true
-    last_revid: number
+    latest_revid: number
 }
 
 // OCとして正しいかのassertion

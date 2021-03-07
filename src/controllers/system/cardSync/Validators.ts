@@ -52,7 +52,7 @@ export const upsertOneValidator = [
     // 永久収容の真理値チェック
     body('banned').optional({ nullable: true }).isBoolean().withMessage(MESSAGE_IS_BOOLEAN),
     // リビジョンの必須・整数チェック
-    body('last_revid').not().isEmpty().withMessage(MESSAGE_REQUIRED).isInt().withMessage(MESSAGE_IS_INT),
+    body('latest_revid').not().isEmpty().withMessage(MESSAGE_REQUIRED).isInt().withMessage(MESSAGE_IS_INT),
 ];
 
 // カード削除のバリデータ
