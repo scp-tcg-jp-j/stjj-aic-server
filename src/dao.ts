@@ -1,6 +1,6 @@
 import Datastore from 'nedb'
 
-const DB_BASE = '/home/stjj-aic/db'
+const DB_BASE = '/home/stjj-aic/nedb'
 export const cardDb = new Datastore({ filename: DB_BASE + '/cards.nedb'})
 cardDb.loadDatabase(function (err) {
     if (err) {
