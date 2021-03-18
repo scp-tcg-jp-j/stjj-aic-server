@@ -1,5 +1,6 @@
 import express from 'express'
 import fs from 'fs'
+import http from 'http'
 import https from 'https'
 import { configRoutes } from './webRoutes'
 import { configSystemRoutes } from './systemRoutes'
@@ -82,4 +83,4 @@ const systemRouter: express.Router = express.Router()
 configSystemRoutes(systemRouter)
 // Expressアプリにルータを登録
 systemApp.use(systemRouter)
-https.createServer(systemApp).listen(55000)
+http.createServer(systemApp).listen(55000)
