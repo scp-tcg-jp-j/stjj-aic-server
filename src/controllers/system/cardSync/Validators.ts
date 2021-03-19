@@ -14,7 +14,8 @@ export const upsertOneValidator = [
     // ページIDの必須・整数チェック
     body('pageid').not().isEmpty().withMessage(MESSAGE_REQUIRED).isInt().withMessage(MESSAGE_IS_INT),
     // カード名の必須・文字列チェック
-    body('name').not().isEmpty().withMessage(MESSAGE_REQUIRED).isString().withMessage(MESSAGE_IS_STRING),
+    // todo: 名前のないTaleが空文字列で入ってくるので一旦切ってる
+    // body('name').not().isEmpty().withMessage(MESSAGE_REQUIRED).isString().withMessage(MESSAGE_IS_STRING),
     // コストの数値チェック
     body('cost').optional({ nullable: true }).isNumeric().withMessage(MESSAGE_IS_NUMERIC),
     // 確保力の数値チェック
@@ -24,11 +25,13 @@ export const upsertOneValidator = [
         assertsIsOc(oc)
         return true
     }),
+    // todo: リザレクションがCanonではなくカノンで入ってくるので一旦切ってる
+    /*
     // メインタイプの必須・配列チェック・要素がSTJJのメインタイプかチェック
     body('maintypes').not().isEmpty().withMessage(MESSAGE_REQUIRED).isArray().withMessage(MESSAGE_IS_ARRAY).custom(maintypes => {
         (maintypes as Array<any>).forEach(maintype => assertsIsMainType(maintype))
         return true
-    }),
+    }),*/
     // サブタイプの配列チェック・要素が文字列かチェック
     body('subtypes').optional({ nullable: true }).isArray().withMessage(MESSAGE_IS_ARRAY).custom(subtypes => {
         (subtypes as Array<any>).forEach(subtype => {
