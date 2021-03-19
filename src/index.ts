@@ -2,8 +2,11 @@ import express from 'express'
 import fs from 'fs'
 import http from 'http'
 import https from 'https'
+import compression = require('compression')
 import { configRoutes } from './webRoutes'
 import { configSystemRoutes } from './systemRoutes'
+import morgan = require('morgan')
+import { logger } from './logger'
 
 // 以下、ポートとか証明書とか設定して実行（引数でローカル環境か本番環境か分岐）
 if (process.argv.includes('--env=local')) {
@@ -12,6 +15,16 @@ if (process.argv.includes('--env=local')) {
      */
     // Expressアプリの生成
     const webApp: express.Express = express()
+    // HTTPログをmorganからwinstonに流す
+    webApp.use(
+        morgan('', {
+            stream: {
+                write: message => logger.info(message.trim()),
+            },
+        })
+    );
+    // 圧縮ミドルウェア設定
+    webApp.use(compression())
     // bodyパーサ用ミドルウェア設定
     webApp.use(express.json())
     webApp.use(express.urlencoded({ extended: true }))
@@ -41,6 +54,16 @@ if (process.argv.includes('--env=local')) {
      */
     // Expressアプリの生成
     const webApp: express.Express = express()
+    // HTTPログをmorganからwinstonに流す
+    webApp.use(
+        morgan('', {
+            stream: {
+                write: message => logger.info(message.trim()),
+            },
+        })
+    );
+    // 圧縮ミドルウェア設定
+    webApp.use(compression())
     // bodyパーサ用ミドルウェア設定
     webApp.use(express.json())
     webApp.use(express.urlencoded({ extended: true }))
@@ -74,6 +97,16 @@ if (process.argv.includes('--env=local')) {
  */
 // Expressアプリの生成
 const systemApp: express.Express = express()
+// HTTPログをmorganからwinstonに流す
+systemApp.use(
+    morgan('', {
+        stream: {
+            write: message => logger.info(message.trim()),
+        },
+    })
+);
+// 圧縮ミドルウェア設定
+systemApp.use(compression())
 // bodyパーサ用ミドルウェア設定
 systemApp.use(express.json())
 systemApp.use(express.urlencoded({ extended: true }))

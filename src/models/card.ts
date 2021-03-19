@@ -1,10 +1,10 @@
 import { MESSAGE_IS_OC, MESSAGE_IS_MAINTYPE } from './../constants'
 
 // STJJのメインタイプ
-const mainTypes = ['オブジェクト', '人事', 'Tale', 'Incident', 'Canon', 'Hub'] as const
+const mainTypes = ['オブジェクト', '人事', 'Tale', 'Incident', 'Canon', 'Hub', '契約'] as const
 export type MainType = typeof mainTypes[number]
 // STJJのルールで定義されたサブタイプ（使わないかも）
-const ruleDefinedSubTypes = ['【効果】', '【コンビ】', '【フィールド】', '【トークン】', '【契約】'] as const
+const ruleDefinedSubTypes = ['【効果】', '【コンビ】', '【フィールド】', '【トークン】'] as const
 export type RuleDefinedSubType = typeof ruleDefinedSubTypes[number]
 // STJJのOC
 const objectClasses = ['Safe', 'Euclid', 'Keter', 'Thaumiel', 'Neutralized', 'Unclassed', 'Anomalous', 'Explained'] as const

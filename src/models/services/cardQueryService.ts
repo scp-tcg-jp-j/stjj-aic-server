@@ -5,10 +5,10 @@ export async function currentCards() {
     return new Promise<{ pageid: number, latest_revid: number }[]>((resolve, reject) => 
         cardDb.find({}, { _id: 0, pageid: 1, latest_revid: 1 }, function (errorOfFind, cards) {
             if (errorOfFind) {
-                reject(errorOfFind)
+                return reject(errorOfFind)
             }
 
-            resolve(cards)
+            return resolve(cards)
         })
     )
 }

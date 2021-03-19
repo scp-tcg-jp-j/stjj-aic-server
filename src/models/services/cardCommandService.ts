@@ -6,7 +6,7 @@ export async function upsertOne(card: Card) {
     return new Promise<void>((resolve, reject) => 
         cardDb.find({ pageid: card.pageid }).exec(async function (errorOfFind, oldCard: any) {
             if (errorOfFind) {
-                reject(errorOfFind)
+                return reject(errorOfFind)
             }
 
             // カード更新の場合は_idを_id_oldに変更（旧カード用DBでの重複を避けるため）
@@ -15,7 +15,10 @@ export async function upsertOne(card: Card) {
                 oldCard._id_old = oldCard._id
                 delete oldCard._id
                 // 旧カード用DBに投入
-                await archiveOld(oldCard).catch((reason) => reject(reason))
+                const archiveOldResult = await archiveOld(oldCard).catch((reason) => reason)
+                if (archiveOldResult instanceof Error) {
+                    return reject(archiveOldResult)
+                }
             }
 
             // DB変更用オブジェクトの生成
@@ -25,11 +28,11 @@ export async function upsertOne(card: Card) {
 
             cardDb.update({ pageid: card.pageid }, { $set: upsertSetter, $unset: upsertUnsetter }, { upsert: true }, function (errorOfUpsert) {
                 if (errorOfUpsert) {
-                    reject(errorOfUpsert)
+                    return reject(errorOfUpsert)
                 }
                 // NeDBのコンパクション実行
                 cardDb.persistence.compactDatafile()
-                resolve()
+                return resolve()
             })
         })
     )
@@ -41,7 +44,7 @@ export async function bulkDelete(deleteTargetCardPageids: number[]) {
         // 削除対象のカードを抽出
         cardDb.find({ pageid: { $in: deleteTargetCardPageids } }).exec(async function (errorOfFind, cardsToDelete) {
             if (errorOfFind) {
-                reject(errorOfFind)
+                return reject(errorOfFind)
             }
 
             // _idを_id_oldに変更（旧カード用DBでの重複を避けるため）
@@ -51,16 +54,19 @@ export async function bulkDelete(deleteTargetCardPageids: number[]) {
             })
 
             // 旧カード用DBに投入
-            await archiveOld(cardsToDelete).catch((reason) => reject(reason))
+            const archiveOldResult = await archiveOld(cardsToDelete).catch((reason) => reason)
+            if (archiveOldResult instanceof Error) {
+                return reject(archiveOldResult)
+            }
 
             // 現カード用DBから削除
             cardDb.remove({ pageid: { $in: cardsToDelete.map(oldCard => oldCard.pageid) } }, { multi: true }, function (errorOfDelete, deletedCardsCount) {
                 if (errorOfDelete) {
-                    reject(errorOfDelete)
+                    return reject(errorOfDelete)
                 }
                 // NeDBのコンパクション実行
                 cardDb.persistence.compactDatafile()
-                resolve(deletedCardsCount)
+                return resolve(deletedCardsCount)
             })
         })
     )
@@ -71,11 +77,11 @@ async function archiveOld(docOrDocs: any): Promise<void> {
     return new Promise((resolve, reject) => {
         oldCardDb.insert(docOrDocs, function (errorOfInsert) {
             if (errorOfInsert) {
-                reject(errorOfInsert)
+                return reject(errorOfInsert)
             }
             // NeDBのコンパクション実行
             oldCardDb.persistence.compactDatafile()
-            resolve()
+            return resolve()
         })
     })
 }

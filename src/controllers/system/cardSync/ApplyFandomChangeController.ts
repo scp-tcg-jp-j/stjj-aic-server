@@ -1,20 +1,24 @@
 import { MainType, ObjectClass } from '../../../models/card';
-import { Request, Response } from 'express'
-import { upsertOne, bulkDelete } from '../../../models/services/cardCommandService'
-import { currentCards } from '../../../models/services/cardQueryService'
+import { Request, Response } from 'express';
+import { upsertOne, bulkDelete } from '../../../models/services/cardCommandService';
+import { currentCards } from '../../../models/services/cardQueryService';
 import { validationResult, matchedData } from 'express-validator';
+import { logger } from '../../../logger';
 
 // カード追加・カード更新（1枚）
 export function postUpsertOne(req: Request, res: Response) {
+    logger.info(req.body);
 
     // バリデーション実行
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        logger.warn(errors);
         res.status(422).json({ errors: errors.array() }).send();
+        return
     }
 
     // リクエストボディからバリデーション済のデータだけ取り出す
-    const raw = matchedData(req, { includeOptionals: true, locations: ['body'] })
+    const raw = matchedData(req, { includeOptionals: true, locations: ['body'] });
 
     // カード追加・カード更新用オブジェクトの生成
     const card = {
@@ -32,26 +36,46 @@ export function postUpsertOne(req: Request, res: Response) {
     }
 
     // カード追加・カード更新の実行
-    upsertOne(card).then(() => res.status(200).send()).catch(error => res.status(500).json({ errors: error }).send())
+    upsertOne(card).then(() => {
+        res.status(200).send();
+    }).catch(error => {
+        logger.error(error);
+        res.status(500).json({ errors: error }).send();
+    })
 }
 
 // カード削除
 export function postBulkDelete(req: Request, res: Response) {
+    logger.info(req.body)
 
     // バリデーション実行
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        logger.warn(errors);
+        res.status(422).json({ errors: errors.array() });
+        return
     }
 
     // リクエストボディからバリデーション済のデータだけ取り出す
     const raw = matchedData(req, { includeOptionals: true, locations: ['body'] })
 
     // カード削除の実行
-    bulkDelete(raw['deleteTargetCardPageids']).then((deletedCardsCount)=>res.status(200).send({ count: deletedCardsCount })).catch(error => res.status(500).json({ errors: error }).send())
+    bulkDelete(raw['deleteTargetCardPageids']).then((deletedCardsCount) => {
+        logger.info("deleted " + deletedCardsCount + " cards");
+        res.status(200).send({ count: deletedCardsCount });
+    }).catch(error => {
+        logger.error(error);
+        res.status(500).json({ errors: error }).send();
+    });
 }
 
 // DBに存在するカードの一覧を取得する（pageidとlatest_revidのペアだけ）
 export function getCurrentCards(req: Request, res: Response) {
-    currentCards().then((cards) => res.status(200).send(cards)).catch(error => res.status(500).json({ errors: error }).send())
+    currentCards().then((cards) => {
+        // 結果のJSONが大きくなりそうなためログは吐かない（デバッグ用は要検討）
+        res.status(200).send(cards);
+    }).catch(error => {
+        logger.error(error);
+        res.status(500).json({ errors: error }).send();
+    })
 }
