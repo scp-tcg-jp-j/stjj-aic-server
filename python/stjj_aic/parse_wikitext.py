@@ -2,6 +2,11 @@
 import json
 import mwparserfromhell
 
+def to_Canon(a):
+    for idx in range(len(a)):
+        if a[idx] == "canon" or a[idx] == "カノン":
+            a[idx] = "Canon"
+
 def parse_wikitext(wikitext, wt, cardid_list):
     tps = mwparserfromhell.parse(wikitext).filter_templates()[0].params
         
@@ -16,7 +21,7 @@ def parse_wikitext(wikitext, wt, cardid_list):
     cardprops["cost"] = int(vals[8]) if vals[8] != '' else None
     cardprops["attack"] = int(vals[7]) if vals[7] != '' else None
     cardprops["oc"] = vals[6] if vals[6] != "" else None
-    cardprops["maintypes"] = vals[0].split(' ')
+    cardprops["maintypes"] = to_Canon(vals[0].split(' '))
     cardprops["subtypes"] = vals[1].split(' ') if vals[1].split(' ')[0] != "" else None
     cardprops["effect"] = vals[9] if vals[9] != "" else None
     cardprops["tags"] = vals[11].split(' ') if vals[11].split(' ')[0] != "" else None
