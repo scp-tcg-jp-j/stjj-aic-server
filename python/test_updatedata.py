@@ -61,7 +61,7 @@ class ActionCardData:
         req = requests.Session()
         print(carddata)
         headers = {"content-type": "application/json"}
-        response = req.post(url = url, data = carddata, headers = headers,  verify = verify)
+        response = req.post(url = url, data = json.dumps(carddata), headers = headers,  verify = verify)
         return response
 
 
@@ -72,7 +72,7 @@ class ActionCardData:
         data = {"deleteTargetCardPageids": cardids}
         print(data)
         headers = {"content-type": "application/json"}
-        response = req.post(url = url, data = data, headers = headers,  verify = verify)
+        response = req.post(url = url, data = json.dumps(data), headers = headers,  verify = verify)
         return response
 
     @staticmethod
