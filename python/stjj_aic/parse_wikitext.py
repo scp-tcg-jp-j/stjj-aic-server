@@ -6,6 +6,7 @@ def to_Canon(a):
     for idx in range(len(a)):
         if a[idx] == "canon" or a[idx] == "カノン":
             a[idx] = "Canon"
+    return a
 
 def parse_wikitext(wikitext, wt, cardid_list):
     tps = mwparserfromhell.parse(wikitext).filter_templates()[0].params
