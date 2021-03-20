@@ -6,6 +6,7 @@ import getpass
 import mwparserfromhell
 import requests
 import sys
+import time
 
 from stjj_aic.parse_wikitext import parse_wikitext
 from stjj_aic.getpostrequest import GetPostRequest
@@ -19,7 +20,8 @@ class GetCardDataFromFandom:
         #241: テンプレート:Cardtable
         #238: TEST 1（カードテンプレートページ）
         #246: Test2（カードページ見本）
-        testpageids = ['241', '238', '246']
+        #7016: TEST 3（空白のカードテンプレートページ）
+        testpageids = ['241', '238', '246', '7016']
 
         #cardid_list = {pageid: {"pageid": pageid, "lastrevid": lastrevid}, ...}
         cardid_list = {}
@@ -57,21 +59,27 @@ class ActionCardData:
     @staticmethod
     def UpdateOrAdd(url : str, carddata: dict, verify = True):
         req = requests.Session()
-        response = req.post(url = url, data = json.dumps(carddata), verify = verify)
+        print(carddata)
+        headers = {"content-type": "application/json"}
+        response = req.post(url = url, data = carddata, headers = headers,  verify = verify)
         return response
 
 
     @staticmethod
     def Delete(url : str, cardids: [int], verify = True):
         req = requests.Session()
+        print(cardids)
         data = {"deleteTargetCardPageids": cardids}
-        response = req.post(url = url, data = json.dumps(data), verify = verify)
+        print(data)
+        headers = {"content-type": "application/json"}
+        response = req.post(url = url, data = data, headers = headers,  verify = verify)
         return response
 
     @staticmethod
     def getDBCardData(url : str, verify = True):
         req = requests.Session()
-        response = req.get(url = url, verify = verify)
+        headers = {"content-type": "application/json"}
+        response = req.get(url = url,headers = headers, verify = verify)
         return response
 
 
@@ -107,17 +115,20 @@ def main():
 
     ###カードのデータを得てDBに保存する###
     print("カードidの取得中")
-    #cardid_list = GetCardDataFromFandom.getCardData(gpreq)
-    cardid_list = generate_fandomcardidlist()
+    cardid_list = GetCardDataFromFandom.getCardData(gpreq)
+    #cardid_list = generate_fandomcardidlist()
 
     ###DBのカードデータ取得
     try: 
-        dbcarddata = ActionCardData.getDBCardData("http://localhost:55000/current_cards", False)
+        start = time.time()
+        dbcarddata = ActionCardData.getDBCardData("http://localhost:55000/current_cards", False).json()
+        end  = time.time()
+        print(f"time : {end - start}")
     except requests.exceptions.ConnectionError as e:
         print(e)
         sys.exit(1)
-    dbcarddata = generate_dbcardidlist()
-
+    #dbcarddata = generate_dbcardidlist()
+    print(dbcarddata)
     update_or_add_ids = []
     delete_ids = []
 
@@ -126,7 +137,7 @@ def main():
         for dbid in dbcarddata:
             if dbid["pageid"] == fandomid:
                 f = True
-                if cardid_list[fandomid]["lastrevid"] != dbid["last_revid"]:
+                if cardid_list[fandomid]["lastrevid"] != dbid["latest_revid"]:
                     update_or_add_ids.append(fandomid)
                     break
         if not f:
@@ -138,11 +149,10 @@ def main():
             if dbid["pageid"] == fandomid:
                 f = True
         if not f:
-            delete_ids.append(dbid["pageid"])
+            delete_ids.append(int(dbid["pageid"]))
 
     print(update_or_add_ids)
     print(delete_ids)
-    sys.exit(0) #ここまで
 
 
     print("wikitextの取得中")
@@ -150,6 +160,7 @@ def main():
 
     ###更新または追加カードのidからそのページのwikitextを得、実際に更新または追加する
     for id in update_or_add_ids:
+        print(id)
         #wikitextの取得
         WIKITEXT_QUERY = {
             "action": "parse",
@@ -160,14 +171,15 @@ def main():
         R = gpreq.postRequest(WIKITEXT_QUERY)
         wikitext = R.json()["parse"]["wikitext"]["*"]
 
-        cardprops = parse_wikitext(wikitext, id, vardid_list)
+        cardprops = parse_wikitext(wikitext, id, cardid_list)
         
         response = ActionCardData.UpdateOrAdd("http://localhost:55000/upsert", cardprops)
-
+        print(response.status_code)
+        
 
     #カードを削除する
     response = ActionCardData.Delete("http://localhost:55000/bulk_delete", delete_ids)
-
+    print(response.status_code)
 
 if __name__ == "__main__":
     main()

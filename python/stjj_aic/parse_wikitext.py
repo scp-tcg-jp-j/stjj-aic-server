@@ -20,7 +20,7 @@ def parse_wikitext(wikitext, wt, cardid_list):
     cardprops["subtypes"] = vals[1].split(' ') if vals[1].split(' ')[0] != "" else None
     cardprops["effect"] = vals[9] if vals[9] != "" else None
     cardprops["tags"] = vals[11].split(' ') if vals[11].split(' ')[0] != "" else None
-    cardprops["banned"] = True if val[12] == "永久収容" else False
-    cardprops["latest_revid"] = cardid_list[int(wt)]
+    cardprops["banned"] = True if vals[12] == "永久収容" else False
+    cardprops["latest_revid"] = cardid_list[int(wt)]["lastrevid"]
 
     return cardprops
