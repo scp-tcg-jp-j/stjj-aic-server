@@ -14,8 +14,9 @@ export const upsertOneValidator = [
     // ページIDの必須・整数チェック
     body('pageid').not().isEmpty().withMessage(MESSAGE_REQUIRED).isInt().withMessage(MESSAGE_IS_INT),
     // カード名の必須・文字列チェック
-    // todo: 名前のないTaleが空文字列で入ってくるので一旦切ってる
+    // todo: 名前のないTaleが空文字列で入ってくるのでrequiredは一旦切ってる
     // body('name').not().isEmpty().withMessage(MESSAGE_REQUIRED).isString().withMessage(MESSAGE_IS_STRING),
+    body('name').isString().withMessage(MESSAGE_IS_STRING),
     // コストの数値チェック
     body('cost').optional({ nullable: true }).isNumeric().withMessage(MESSAGE_IS_NUMERIC),
     // 確保力の数値チェック
@@ -32,6 +33,7 @@ export const upsertOneValidator = [
         (maintypes as Array<any>).forEach(maintype => assertsIsMainType(maintype))
         return true
     }),*/
+    body('maintypes').not().isEmpty().withMessage(MESSAGE_REQUIRED).isArray().withMessage(MESSAGE_IS_ARRAY),
     // サブタイプの配列チェック・要素が文字列かチェック
     body('subtypes').optional({ nullable: true }).isArray().withMessage(MESSAGE_IS_ARRAY).custom(subtypes => {
         (subtypes as Array<any>).forEach(subtype => {
