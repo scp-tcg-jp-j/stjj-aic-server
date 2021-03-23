@@ -23,7 +23,7 @@ export async function upsertOne(card: Card) {
 
             // DB変更用オブジェクトの生成
             const upsertSetter = card
-            const upsertUnsetter = { cost: true, attack: true, oc: true, subtypes: true, effect: true, tags: true } as any
+            const upsertUnsetter = { cost: true, attack: true, oc: true, subtypes: true, effect: true, tags: true, page_title: true, } as any
             Object.keys(card).forEach(key => delete upsertUnsetter[key])
 
             cardDb.update({ pageid: card.pageid }, { $set: upsertSetter, $unset: upsertUnsetter }, { upsert: true }, function (errorOfUpsert) {

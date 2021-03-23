@@ -58,6 +58,8 @@ export const upsertOneValidator = [
     body('banned').optional({ nullable: true }).isBoolean().withMessage(MESSAGE_IS_BOOLEAN),
     // リビジョンの必須・整数チェック
     body('latest_revid').not().isEmpty().withMessage(MESSAGE_REQUIRED).isInt().withMessage(MESSAGE_IS_INT),
+    // ページタイトルの文字列チェック
+    body('page_title').optional({ nullable: true }).isString().withMessage(MESSAGE_IS_STRING),
 ];
 
 // カード削除のバリデータ

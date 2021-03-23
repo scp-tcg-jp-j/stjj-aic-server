@@ -24,6 +24,7 @@ export interface Card {
     tags?: [string, ...string[]];
     banned?: true
     latest_revid: number
+    page_title?: string
 }
 
 // OCとして正しいかのassertion
