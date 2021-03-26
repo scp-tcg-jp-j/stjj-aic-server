@@ -1,32 +1,71 @@
 #!/usr/bin/python3
 import json
 import mwparserfromhell
+import re
 
-def to_Canon(a):
-    for idx in range(len(a)):
-        if a[idx] == "canon" or a[idx] == "カノン":
-            a[idx] = "Canon"
-    return a
+from .carddata import CardData
 
-def parse_wikitext(wikitext, wt, cardid_list):
-    tps = mwparserfromhell.parse(wikitext).filter_templates()[0].params
-        
-    vals = []
-    for val in tps:
-        print(val)
-        vals.append(val.split("=")[1].strip())
+class ParseError(Exception):
+    pass
 
-    cardprops = {}
-    cardprops["pageid"] = int(wt)
-    cardprops["name"] = vals[4]
-    cardprops["cost"] = int(vals[8]) if vals[8] != '' else None
-    cardprops["attack"] = int(vals[7]) if vals[7] != '' else None
-    cardprops["oc"] = vals[6] if vals[6] != "" else None
-    cardprops["maintypes"] = to_Canon(vals[0].split(' '))
-    cardprops["subtypes"] = vals[1].split(' ') if vals[1].split(' ')[0] != "" else None
-    cardprops["effect"] = vals[9] if vals[9] != "" else None
-    cardprops["tags"] = vals[11].split(' ') if vals[11].split(' ')[0] != "" else None
-    cardprops["banned"] = True if vals[12] == "永久収容" else False
-    cardprops["latest_revid"] = cardid_list[int(wt)]["lastrevid"]
+'''
+{{Cardtable
+    |card_type    = String
+    |sub_type     = String 
+    |type         = String
+    |number       = Number
+    |name         = String
+    |image        = String
+    |object_class = String
+    |attack       = Number
+    |cost         = Number
+    |effect_text  = String
+    |flavor_text  = String
+    |tags         = String
+    |limited      = String
+    |effect_tags  = String
+    |source       = String
+    |remark       = String
+}}
+'''
 
-    return cardprops
+
+'''
+返り値
+    {
+    'sub_type'      : 'value1'
+    ,'type'         : 'value2'
+    ,'number'       : 'value3'
+    ・・・
+    ,'source'       : 'valuex'
+    ,'remark'       : 'valuey'
+    }
+'''
+#Wikitextのパースを行う
+#フレーバーやカード名に区切り文字('{{','}}','|','=')が使用されるとエラーが発生する。
+def parse_wikitext(wikitext: str) -> dict:
+
+    try:
+        #{{または}}で区切る。3つに分割されるが必要なのは1番目だけ。
+        wikitext_main = re.split('{{|}}', wikitext)[1]
+        #|で区切った後、整形(文字列両端の空白を取り除く)
+        splited_wikitext = wikitext_main.split('|')
+        dict_splitted_wikitext = {}
+        for ele in splited_wikitext:
+            #分割後の文字列をそれぞれ=で区切る。Cardtableは棄却する
+            if ele == 'Cardtable' :
+                continue
+            splitted_ele = ele.split('=')
+            #要素 = 値を辞書として'要素' : '値'にして保存。全てstr
+            dict_splitted_wikitext[splitted_ele[0].strip()] = splitted_ele[1].strip()
+
+        return dict_splitted_wikitext
+    except:
+        raise ParseError("Failed to Parse Wikitext.")
+
+def format_carddata(dw : dict, pageid : int, latest_revid : int, pagetitle : str) ->CardData:
+    carddata = CardData()
+    carddata.convert_wikitextdict(pageid, dw['name'], dw['cost'], dw['attack'], dw['object_class'], dw['card_type'], dw['sub_type'], dw['effect_text'], dw["tags"], dw["limited"], latest_revid, pagetitle)
+    return carddata
+    
+
