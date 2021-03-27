@@ -1,0 +1,1 @@
+0 0 * * * /opt/.pyenv/shims/python /var/www/stjj-aic-server/python/update_db.py
