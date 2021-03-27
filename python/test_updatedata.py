@@ -195,7 +195,7 @@ def main():
         try:
             response = ActionCardData.UpdateOrAdd("http://localhost:55000/upsert", cardprops)
             if response.status_code == requests.codes.ok:
-                logger.info("{} : Upsert Card To DB : {} : OK".format(now.strftime('%Y-%m-%d %H:%M:%S'), json.dumps(cardprops, ensure_ascii=False)))
+                logger.debug("{} : Upsert Card To DB : {} : OK".format(now.strftime('%Y-%m-%d %H:%M:%S'), json.dumps(cardprops, ensure_ascii=False)))
             elif response.status_code == 422:
                 logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' + json.dumps(response.json()['error'], ensure_ascii=False) + ' : '+ 'NG' )) 
                 sys.exit(1)
@@ -212,7 +212,7 @@ def main():
         try:
             response = ActionCardData.Delete("http://localhost:55000/bulk_delete", delete_ids)
             if response.status_code == requests.codes.ok:
-                logger.info("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'OK')) 
+                logger.debug("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'OK')) 
             elif response.status_code == 422:
                 logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + json.dumps(response.json()['error'], ensure_ascii=False) + ' : '+ 'NG' ))
                 sys.exit(1)
@@ -222,7 +222,6 @@ def main():
         except requests.exceptions.ConnectionError as e:
             logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' +  ','.join(map(str, delete_ids)) + ' : ' + 'ConnectionError' + ' : '+ 'NG'))
             print(e)
-            #print(response.status_code)
     
     logger.info("End...")
 
