@@ -176,7 +176,6 @@ def main():
 
     ###更新または追加カードのidからそのページのwikitextを得、実際に更新または追加する
     for id in update_or_add_ids:
-        print(id)
         #wikitextの取得
         WIKITEXT_QUERY = {
             "action": "parse",
@@ -185,7 +184,6 @@ def main():
             "format": "json"
         }
         R = gpreq.postRequest(WIKITEXT_QUERY)
-        print(R.json())
         wikitext = R.json()["parse"]["wikitext"]["*"]
         try:
             cardprops = format_carddata(parse_wikitext(wikitext), id, cardid_list[id]["lastrevid"], R.json()["parse"]["title"]).getCardDataDict()
