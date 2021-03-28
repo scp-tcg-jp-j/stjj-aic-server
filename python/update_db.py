@@ -198,7 +198,7 @@ def main():
                 logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' + json.dumps(response.json()['error'], ensure_ascii=False) + ' : '+ 'NG' )) 
                 sys.exit(1)
             else:
-                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' +'Bad Request' + ' : '+ 'NG' )) 
+                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' +'StatusCode=' + str(response.status_code) + ' : '+ 'NG' )) 
                 sys.exit(1)
         except requests.exceptions.ConnectionError as e:
             logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' + 'ConnectionError' + ' : '+ 'NG'))
@@ -215,7 +215,7 @@ def main():
                 logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + json.dumps(response.json()['error'], ensure_ascii=False) + ' : '+ 'NG' ))
                 sys.exit(1)
             else:
-                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'Bad Request' + ' : '+ 'NG' ))
+                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'StatusCode=' + str(response.status_code) + ' : '+ 'NG' ))
                 sys.exit(1)
         except requests.exceptions.ConnectionError as e:
             logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' +  ','.join(map(str, delete_ids)) + ' : ' + 'ConnectionError' + ' : '+ 'NG'))
