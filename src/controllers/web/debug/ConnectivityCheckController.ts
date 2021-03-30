@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { upsertOne } from '../../../models/services/cardCommandService'
 
 // 接続確認用コントローラ（GET）
 export function getConnectivityCheck(req: Request, res: Response) {

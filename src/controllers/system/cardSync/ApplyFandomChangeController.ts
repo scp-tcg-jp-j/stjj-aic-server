@@ -33,7 +33,7 @@ export function postUpsertOne(req: Request, res: Response) {
         tags: (raw['tags'] || undefined) as [string, ...string[]],
         banned: (raw['banned'] || undefined) as true,
         latest_revid: raw['latest_revid'] as number,
-        page_title: raw['page_title'] as string,
+        page_title: (raw['page_title'] || undefined) as string,
     }
 
     // カード追加・カード更新の実行
