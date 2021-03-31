@@ -83,7 +83,7 @@ if (process.argv.includes('--env=local')) {
     // 本番環境のため、greenlockで証明書を取得してポート443で実行する
     require('greenlock-express')
         .init({
-            packageRoot: __dirname,
+            packageRoot: '/var/www/stjj-aic-server',
             maintainerEmail: 'scptcgjpjwiki@gmail.com',
             configDir: './greenlock.d',
             cluster: false
