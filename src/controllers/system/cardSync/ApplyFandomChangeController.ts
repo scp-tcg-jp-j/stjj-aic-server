@@ -20,12 +20,15 @@ export function postUpsertOne(req: Request, res: Response) {
     // リクエストボディからバリデーション済のデータだけ取り出す
     const raw = matchedData(req, { includeOptionals: true, locations: ['body'] });
 
+    const cost = raw['cost'] || (raw['cost'] == 0 ? 0 : undefined)
+    const attack = raw['attack'] || (raw['attack'] == 0 ? 0 : undefined)
+
     // カード追加・カード更新用オブジェクトの生成
     const card = {
         pageid: raw['pageid'] as number,
         name: raw['name'] as string,
-        cost: (raw['cost'] || undefined) as number,
-        attack: (raw['attack'] || undefined) as number,
+        cost: cost as number,
+        attack: attack as number,
         oc: (raw['oc'] || undefined) as ObjectClass,
         maintypes: raw['maintypes'] as [MainType, ...MainType[]],
         subtypes: (raw['subtypes'] || undefined) as [string, ...string[]],
