@@ -79,8 +79,8 @@ export function postFindCards(req: Request, res: Response) {
             })
         }
         // 確保力無限大または無し
-        if (req.body.attackSpecial) {
-            objectOrQuery.push({ attack: null })
+        if (!req.body.attackSpecial) {
+            objectAndQuery.push({ attack: { $exists: true } })
         }
         // コスト（最小）
         if (req.body.costMin ?? false) {
@@ -99,8 +99,8 @@ export function postFindCards(req: Request, res: Response) {
             })
         }
         // コスト無限大または無し
-        if (req.body.costSpecial) {
-            objectOrQuery.push({ cost: null })
+        if (!req.body.costSpecial) {
+            objectAndQuery.push({ cost: { $exists: true } })
         }
         // タグ（AND）
         if (req.body.tags) {
