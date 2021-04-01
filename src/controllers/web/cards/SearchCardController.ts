@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 import { count, find, findAll } from '../../../models/services/cardQueryService'
+import { logger } from '../../../logger'
 
 // カード検索コントローラ（GET）
 export function postFindCards(req: Request, res: Response) {
-    
+    logger.info("postFindCards called")
     // NeDB用のクエリ
     let rootAndQuery = []
     // メインタイプ
@@ -63,7 +64,7 @@ export function postFindCards(req: Request, res: Response) {
             })
         }
         // 確保力（最小）
-        if (req.body.attackMin ?? false) {
+        if (Number.isFinite(req.body.attackMin)) {
             objectAndQuery.push({
                 attack: {
                     $gte: req.body.attackMin
@@ -71,7 +72,7 @@ export function postFindCards(req: Request, res: Response) {
             })
         }
         // 確保力（最大）
-        if (req.body.attackMax ?? false) {
+        if (Number.isFinite(req.body.attackMax)) {
             objectAndQuery.push({
                 attack: {
                     $lte: req.body.attackMax
@@ -83,7 +84,7 @@ export function postFindCards(req: Request, res: Response) {
             objectAndQuery.push({ attack: { $exists: true } })
         }
         // コスト（最小）
-        if (req.body.costMin ?? false) {
+        if (Number.isFinite(req.body.costMin)) {
             objectAndQuery.push({
                 cost: {
                     $gte: req.body.costMin
@@ -91,7 +92,7 @@ export function postFindCards(req: Request, res: Response) {
             })
         }
         // コスト（最大）
-        if (req.body.costMax ?? false) {
+        if (Number.isFinite(req.body.costMax)) {
             objectAndQuery.push({
                 cost: {
                     $lte: req.body.costMax
@@ -145,22 +146,34 @@ export function postFindCards(req: Request, res: Response) {
 
     let sort = sortMapper.find(mapper => mapper.key == req.body.sort)?.sort
 
-    console.log("QUERIED")
-    console.log(JSON.stringify(query))
-
+    logger.info("----------")
+    logger.info(JSON.stringify(query))
+    logger.info("----------")
+    logger.info("pageSize:" + req.body.pageSize)
+    logger.info("page:" + req.body.page)
+    logger.info("sort:" + req.body.sort)
+    logger.info("projection:" + JSON.stringify(req.body.projections))
     if (req.body.pageSize == '') {
         findAll(query, projectionBase, sort).then(cards => {
             count(query).then(cardCount => {
+                logger.info("NeDBへのクエリが正常終了しました")
                 res.status(200).json({ cards: cards, count: cardCount }).send()
             })
+        }).catch((reason) => {
+            logger.error(reason)
+            res.status(500).send()
         })
     } else {
         const pageSize = Number.parseInt(req.body.pageSize)
         const skip = req.body.page * pageSize
         find(query, projectionBase, sort, skip, pageSize).then(cards => {
             count(query).then(cardCount => {
+                logger.info("NeDBへのクエリが正常終了しました")
                 res.status(200).json({ cards: cards, count: cardCount }).send()
             })
+        }).catch((reason) => {
+            logger.error(reason)
+            res.status(500).send()
         })
     }
 }
