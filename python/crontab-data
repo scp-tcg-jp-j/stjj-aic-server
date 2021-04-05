@@ -1,0 +1,1 @@
+0 0 * * * cd /var/www/stjj-aic-server/python && /opt/.pyenv/shims/python /var/www/stjj-aic-server/python/update_db.py >> /home/stjj-aic/log/cron.log 2>&1
