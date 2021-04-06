@@ -91,15 +91,15 @@ def generate_dbcardidlist():
     data = [
     {
         "pageid": 1 ,
-        "last_revid": 1
+        "lastrevid": 1
     },
     {
         "pageid": 2 ,
-        "last_revid": 1
+        "lastrevid": 1
     },
     {
         "pageid": 3 , 
-        "last_revid": 1
+        "lastrevid": 1
     },
     ]
 
@@ -156,7 +156,7 @@ def main():
         for dbid in dbcarddata:
             if dbid["pageid"] == fandomid:
                 f = True
-                if cardid_list[fandomid]["lastrevid"] != dbid["latest_revid"]:
+                if cardid_list[fandomid]["lastrevid"] != dbid["lastrevid"]:
                     update_or_add_ids.append(fandomid)
                     break
         if not f:

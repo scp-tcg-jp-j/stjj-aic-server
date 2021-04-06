@@ -63,9 +63,9 @@ def parse_wikitext(wikitext: str) -> dict:
     except:
         raise ParseError("Failed to Parse Wikitext.")
 
-def format_carddata(dw : dict, pageid : int, latest_revid : int, pagetitle : str) ->CardData:
+def format_carddata(dw : dict, pageid : int, lastrevid : int, pagetitle : str) ->CardData:
     carddata = CardData()
-    carddata.convert_wikitextdict(pageid, dw['name'], dw['cost'], dw['attack'], dw['object_class'], dw['card_type'], dw['sub_type'], dw['effect_text'], dw["tags"], dw["limited"], latest_revid, pagetitle)
+    carddata.convert_wikitextdict(pageid, dw['name'], dw['cost'], dw['attack'], dw['object_class'], dw['card_type'], dw['sub_type'], dw['effect_text'], dw["tags"], dw["limited"], lastrevid, pagetitle)
     return carddata
     
 
