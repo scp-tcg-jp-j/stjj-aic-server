@@ -1,10 +1,10 @@
 import { Card } from '../card';
 import { cardDb, oldCardDb } from './../../dao';
 
-// DBに存在するカードのpageidとlatest_revidのペアの配列
+// DBに存在するカードのpageidとlastrevidのペアの配列
 export async function currentCards() {
-    return new Promise<{ pageid: number, latest_revid: number }[]>((resolve, reject) => 
-        cardDb.find({}, { _id: 0, pageid: 1, latest_revid: 1 }, function (errorOfFind, cards) {
+    return new Promise<{ pageid: number, lastrevid: number }[]>((resolve, reject) => 
+        cardDb.find({}, { _id: 0, pageid: 1, lastrevid: 1 }, function (errorOfFind, cards) {
             if (errorOfFind) {
                 return reject(errorOfFind)
             }
