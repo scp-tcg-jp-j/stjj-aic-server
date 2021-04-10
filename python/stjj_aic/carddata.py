@@ -12,7 +12,7 @@ class CardData:
         return a
 
     #各wikitextから得られた要素をカードデータに変換(型注釈無しは全部str)
-    def convert_wikitextdict(self, pageid : int, name, cost, attack, oc, maintypes, subtypes, effect, tags, banned, latest_revid: int, page_title):
+    def convert_wikitextdict(self, pageid : int, name, cost, attack, oc, maintypes, subtypes, effect, tags, banned, lastrevid: int, page_title):
         try:
             self._carddata["pageid"] = pageid
             self._carddata["name"] = name
@@ -24,7 +24,7 @@ class CardData:
             self._carddata["effect"] = effect if effect != "" else None
             self._carddata["tags"] = tags.split(' ') if tags.split(' ')[0] != "" else None
             self._carddata["banned"] = True if banned == "永久収容" else False
-            self._carddata["latest_revid"] = latest_revid
+            self._carddata["lastrevid"] = lastrevid
             self._carddata["page_title"] = None if name == page_title else page_title
         except:
             raise ConvertError("Failed to Convert Wikitext to dict.")

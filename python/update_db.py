@@ -91,15 +91,15 @@ def generate_dbcardidlist():
     data = [
     {
         "pageid": 1 ,
-        "last_revid": 1
+        "lastrevid": 1
     },
     {
         "pageid": 2 ,
-        "last_revid": 1
+        "lastrevid": 1
     },
     {
         "pageid": 3 , 
-        "last_revid": 1
+        "lastrevid": 1
     },
     ]
 
@@ -156,7 +156,7 @@ def main():
         for dbid in dbcarddata:
             if dbid["pageid"] == fandomid:
                 f = True
-                if cardid_list[fandomid]["lastrevid"] != dbid["latest_revid"]:
+                if cardid_list[fandomid]["lastrevid"] != dbid["lastrevid"]:
                     update_or_add_ids.append(fandomid)
                     break
         if not f:
@@ -195,7 +195,7 @@ def main():
             if response.status_code == requests.codes.ok:
                 logger.debug("{} : Upsert Card To DB : {} : OK".format(now.strftime('%Y-%m-%d %H:%M:%S'), json.dumps(cardprops, ensure_ascii=False)))
             elif response.status_code == 422:
-                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' + json.dumps(response.json()['error'], ensure_ascii=False) + ' : '+ 'NG' )) 
+                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' + json.dumps(response.json()['errors'], ensure_ascii=False) + ' : '+ 'NG' )) 
                 sys.exit(1)
             else:
                 logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Upsert Card To DB' + ' : ' + json.dumps(cardprops, ensure_ascii=False) + ' : ' +'StatusCode=' + str(response.status_code) + ' : '+ 'NG' )) 
@@ -212,7 +212,7 @@ def main():
             if response.status_code == requests.codes.ok:
                 logger.debug("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'OK')) 
             elif response.status_code == 422:
-                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + json.dumps(response.json()['error'], ensure_ascii=False) + ' : '+ 'NG' ))
+                logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + json.dumps(response.json()['errors'], ensure_ascii=False) + ' : '+ 'NG' ))
                 sys.exit(1)
             else:
                 logger.error("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'StatusCode=' + str(response.status_code) + ' : '+ 'NG' ))
