@@ -9,6 +9,7 @@ import sys
 import time
 from datetime import timezone, timedelta, datetime
 import logging
+from typing import List, Dict
 
 from stjj_aic.parse_wikitext import parse_wikitext, format_carddata, ParseError
 from stjj_aic.getpostrequest import GetPostRequest
@@ -26,8 +27,8 @@ class GetCardDataFromFandom:
         #7016: TEST 3（空白のカードテンプレートページ）
         testpageids = ['241', '238', '246', '7016']
 
-        #cardid_list = {pageid: {"pageid": pageid, "lastrevid": lastrevid}, ...}
-        cardid_list = {}
+        #fandom_carddata = {pageid: {"pageid": pageid, "lastrevid": lastrevid}, ...}
+        fandom_carddata = {}
         continue_query = ""
         is_continuance = True
 
@@ -49,72 +50,83 @@ class GetCardDataFromFandom:
             for cardid in cardpages_id:
                 #Test Pageのidでないなら
                 if cardid not in testpageids:
-                    cardid_list[cardpages_id[cardid]["pageid"]] = {'pageid': cardpages_id[cardid]["pageid"], 'lastrevid': cardpages_id[cardid]["lastrevid"]}
+                    fandom_carddata[cardpages_id[cardid]["pageid"]] = {'pageid': cardpages_id[cardid]["pageid"], 'lastrevid': cardpages_id[cardid]["lastrevid"]}
 
             #取得できていないデータを続けて取得する
             is_continuance = "continue" in cardpages
             if is_continuance:
                 continue_query = cardpages["continue"]["gcmcontinue"]
-        return cardid_list
+        return fandom_carddata
 
 class ActionCardData:
     
     @staticmethod
-    def UpdateOrAdd(url : str, carddata: dict, verify = True):
+    def Upsert(carddata: dict, verify = True):
         req = requests.Session()
         headers = {"content-type": "application/json"}
-        response = req.post(url = url, data = json.dumps(carddata, ensure_ascii=False).encode("utf-8"), headers = headers,  verify = verify)
+        response = req.post(url = "http://localhost:55000/upsert", data = json.dumps(carddata, ensure_ascii=False).encode("utf-8"), headers = headers,  verify = verify)
         return response
 
 
     @staticmethod
-    def Delete(url : str, cardids: [int], verify = True):
+    def Delete(cardids: [int], verify = True):
         req = requests.Session()
         print(cardids)
         data = {"deleteTargetCardPageids": cardids}
         print(data)
         headers = {"content-type": "application/json"}
-        response = req.post(url = url, data = json.dumps(data, ensure_ascii = False).encode("utf-8"), headers = headers,  verify = verify)
+        response = req.post(url = "http://localhost:55000/bulk_delete", data = json.dumps(data, ensure_ascii = False).encode("utf-8"), headers = headers,  verify = verify)
 
         return response
 
     @staticmethod
-    def getDBCardData(url : str, verify = True):
+    #DBからカードデータを得る
+    def getdb_carddata(verify = True):
         req = requests.Session()
         headers = {"content-type": "application/json"}
-        response = req.get(url = url,headers = headers, verify = verify)
+        response = req.get(url = "http://localhost:55000/current_cards" ,headers = headers, verify = verify)
         return response
 
 
-#テスト用データの生成
-def generate_dbcardidlist():
-    data = [
-    {
-        "pageid": 1 ,
-        "lastrevid": 1
-    },
-    {
-        "pageid": 2 ,
-        "lastrevid": 1
-    },
-    {
-        "pageid": 3 , 
-        "lastrevid": 1
-    },
-    ]
+#fandom_carddata = {pageid: {"pageid": pageid, "lastrevid": lastrevid}, ...}
+#db_carddata = [{"pageid": pageid, "lastrevid" : lastrevid}, ...]
+#FANDOMで新規登録されたカードまたは更新されたカードのidを追加し配列として返す
+def add_upsertids(db_carddata : List[Dict[str,int]], fandom_carddata : Dict[int, Dict[str, int]]) -> List[int]:
+    upsert_ids = []
 
-    return data
+    for fandomid in fandom_carddata:
+        f = False
+        for dbid in db_carddata:
+            if dbid["pageid"] == fandomid:
+                f = True
+                if fandom_carddata[fandomid]["lastrevid"] != dbid["lastrevid"]:
+                    upsert_ids.append(fandomid)
+                    break
+        if not f:
+            upsert_ids.append(fandomid)
 
-#テスト用fandomカードデータ
-#cardid_list = {pageid: {"pageid": pageid, "lastrevid": lastrevid}, ...}
-def generate_fandomcardidlist():
-    data = {1: {"pageid" : 1, "lastrevid": 1}, 3: {"pageid" : 3, "lastrevid": 2},  5: {"pageid" : 5, "lastrevid": 1}}
-    return data
+    return upsert_ids
+        
+
+#FANDOMから削除されたカードのidを追加し配列として返す
+def add_deleteids(db_carddata : List[Dict[str,int]], fandom_carddata : Dict[int, Dict[str, int]]) -> List[int]:
+    delete_ids = []
+
+    for dbid in db_carddata:
+        f = False
+        for fandomid in fandom_carddata:
+            if dbid["pageid"] == fandomid:
+                f = True
+        if not f:
+            delete_ids.append(int(dbid["pageid"]))
+    
+    return delete_ids
+
+
+
 
 
 def main():
-
-
     JST = timezone(timedelta(hours =+9), "JST")
     now = datetime.now(JST)
 
@@ -133,14 +145,14 @@ def main():
 
     ###カードのデータを得てDBに保存する###
     try:
-        cardid_list = GetCardDataFromFandom.getCardData(gpreq)
+        fandom_carddata = GetCardDataFromFandom.getCardData(gpreq)
         logger.debug("{} : Get Cards from Fandom : OK".format(now.strftime('%Y-%m-%d %H:%M:%S')))
     except requests.exceptions.ConnectionError as e:
         logger.error("{} : Get Cards from Fandom : {} : NG".format(now.strftime('%Y-%m-%d %H:%M:%S'), e))
         sys.exit(1)
     ###DBのカードデータ取得
     try:
-        dbcarddata = ActionCardData.getDBCardData("http://localhost:55000/current_cards", False).json()
+        db_carddata = ActionCardData.getdb_carddata(False).json()
         logger.debug("{} : Get Cards from DB : OK".format(now.strftime('%Y-%m-%d %H:%M:%S')))
     except requests.exceptions.ConnectionError as e:
         logger.error("{} : Get Cards from DB : {} : NG".format(now.strftime('%Y-%m-%d %H:%M:%S'), e))
@@ -148,34 +160,11 @@ def main():
 
 
     #更新・追加対象のカード及び削除対象のカードのidを記録する
-    update_or_add_ids = []
-    delete_ids = []
-
-    for fandomid in cardid_list:
-        f = False
-        for dbid in dbcarddata:
-            if dbid["pageid"] == fandomid:
-                f = True
-                if cardid_list[fandomid]["lastrevid"] != dbid["lastrevid"]:
-                    update_or_add_ids.append(fandomid)
-                    break
-        if not f:
-            update_or_add_ids.append(fandomid)
-
-    for dbid in dbcarddata:
-        f = False
-        for fandomid in cardid_list:
-            if dbid["pageid"] == fandomid:
-                f = True
-        if not f:
-            delete_ids.append(int(dbid["pageid"]))
-
-    #print(update_or_add_ids)
-    #print(delete_ids)
-
+    upsert_ids = add_upsertids(db_carddata, fandom_carddata)
+    delete_ids = add_deleteids(db_carddata, fandom_carddata)
 
     ###更新または追加カードのidからそのページのwikitextを得、実際に更新または追加する
-    for id in update_or_add_ids:
+    for id in upsert_ids:
         #wikitextの取得
         WIKITEXT_QUERY = {
             "action": "parse",
@@ -186,12 +175,12 @@ def main():
         R = gpreq.postRequest(WIKITEXT_QUERY)
         wikitext = R.json()["parse"]["wikitext"]["*"]
         try:
-            cardprops = format_carddata(parse_wikitext(wikitext), id, cardid_list[id]["lastrevid"], R.json()["parse"]["title"]).getCardDataDict()
+            cardprops = format_carddata(parse_wikitext(wikitext), id, fandom_carddata[id]["lastrevid"], R.json()["parse"]["title"]).getCardDataDict()
         except (ConvertError, ParseError) as e:
             logger.error("{} : Parse Wikitext : {} : {} : NG".format(now.strftime('%Y-%m-%d %H:%M:%S'), wikitext, e))
             sys.exit(1)
         try:
-            response = ActionCardData.UpdateOrAdd("http://localhost:55000/upsert", cardprops)
+            response = ActionCardData.Upsert(cardprops)
             if response.status_code == requests.codes.ok:
                 logger.debug("{} : Upsert Card To DB : {} : OK".format(now.strftime('%Y-%m-%d %H:%M:%S'), json.dumps(cardprops, ensure_ascii=False)))
             elif response.status_code == 422:
@@ -208,7 +197,7 @@ def main():
     #カードを削除する
     if delete_ids:
         try:
-            response = ActionCardData.Delete("http://localhost:55000/bulk_delete", delete_ids)
+            response = ActionCardData.Delete(delete_ids)
             if response.status_code == requests.codes.ok:
                 logger.debug("{}".format(now.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Delete Cards From DB' + ' : ' + ','.join(map(str, delete_ids)) + ' : ' + 'OK')) 
             elif response.status_code == 422:
