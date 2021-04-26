@@ -58,6 +58,7 @@ class GetCardDataFromFandom:
                 continue_query = cardpages["continue"]["gcmcontinue"]
         return fandom_carddata
 
+
 class ActionCardData:
     
     @staticmethod
