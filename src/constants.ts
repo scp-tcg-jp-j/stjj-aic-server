@@ -7,3 +7,7 @@ export const MESSAGE_IS_MAINTYPE = 'STJJのメインタイプとして利用可�
 export const MESSAGE_IS_ARRAY = '配列を入力してください'
 export const MESSAGE_IS_ARRAY_OF_STRING = '配列の要素は文字列を入力してください'
 export const MESSAGE_IS_BOOLEAN = 'bool値を入力してください'
+
+export const SALT_ROUNDS = 10
+
+export const ERROR_AUTHENTICATION_FAILED = new Error() // 正常系で認証失敗した場合のエラー用オブジェクト

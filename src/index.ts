@@ -7,9 +7,15 @@ import { configRoutes } from './webRoutes'
 import { configSystemRoutes } from './systemRoutes'
 import morgan = require('morgan')
 import { logger } from './logger'
+import session = require('express-session');
+
+export let BASE_URL: string = "";
+export let BASE_URL_FRONT: string = "";
 
 // 以下、ポートとか証明書とか設定して実行（引数でローカル環境か本番環境か分岐）
 if (process.argv.includes('--env=local')) {
+    BASE_URL = "https://localhost";
+    BASE_URL_FRONT = "https://localhost:8080";
     /**
      * 外部公開用Expressアプリ設定（ローカル環境実行用）
      */
@@ -30,11 +36,23 @@ if (process.argv.includes('--env=local')) {
     webApp.use(express.urlencoded({ extended: true }))
     // CORS設定
     webApp.use(function(req, res, next) {
-        // res.header('Access-Control-Allow-Origin', 'https://localhost:8080')
-        res.header('Access-Control-Allow-Origin', '*') // todo CORS設定が上記で動くようにする
+        res.header('Access-Control-Allow-Origin', 'https://localhost:8080')
+        // res.header('Access-Control-Allow-Origin', '*') // todo CORS設定が上記で動くようにする
+        res.header('Access-Control-Allow-Credentials', 'true')
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
         next()
     })
+    // セッション設定
+    webApp.use(session({
+        secret: 'secret',
+        resave: false,
+        saveUninitialized: true,
+        cookie:{
+            httpOnly: false,
+            secure: false,
+            maxAge: 1000 * 60 * 30
+        }
+    }));
     // ルータ生成
     const webRouter: express.Router = express.Router()
     // ルート設定
@@ -50,6 +68,8 @@ if (process.argv.includes('--env=local')) {
     https.createServer(testcert, webApp).listen(443)
 
 } else if (process.argv.includes('--env=prod')) {
+    BASE_URL = "https://api.scptcgjpj.tk";
+    BASE_URL_FRONT = "https://www.scptcgjpj.tk"
     /**
      * 外部公開用Expressアプリ設定（本番環境実行用）
      */
@@ -71,9 +91,21 @@ if (process.argv.includes('--env=local')) {
     // CORS設定（STJJ.AICのフロントエンドに絞る）
     webApp.use(function(req, res, next) {
         res.header('Access-Control-Allow-Origin', 'https://www.scptcgjpj.tk')
+        res.header('Access-Control-Allow-Credentials', 'true')
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
         next()
     })
+    // セッション設定
+    webApp.use(session({
+        secret: 'secret',
+        resave: false,
+        saveUninitialized: false,
+        cookie:{
+            httpOnly: true,
+            secure: true,
+            maxAge: 1000 * 60 * 30
+        }
+    }));
     // ルータ生成
     const webRouter: express.Router = express.Router()
     // ルート設定

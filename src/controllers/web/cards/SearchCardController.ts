@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { count, find, findAll } from '../../../models/services/cardQueryService'
 import { logger } from '../../../logger'
 
-// カード検索コントローラ（GET）
+// カード検索コントローラ（POST）
 export function postFindCards(req: Request, res: Response) {
     logger.info("postFindCards called")
     // NeDB用のクエリ

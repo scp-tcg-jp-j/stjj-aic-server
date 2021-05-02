@@ -21,3 +21,13 @@ oldCardDb.loadDatabase(function (err) {
         logger.info('STJJ.AIC: old_cards.nedbの読み込みに成功しました')   
     }
 })
+
+export const accountDb = new Datastore({ filename: DB_BASE + '/account.nedb' })
+accountDb.loadDatabase(function (err) {
+    if (err) {
+        logger.error('STJJ.AIC: account.nedbの読み込みに失敗しました')
+        logger.error(err)
+    } else {
+        logger.info('STJJ.AIC: account.nedbの読み込みに成功しました')   
+    }
+})
