@@ -49,7 +49,7 @@ export async function bulkDelete(deleteTargetCardPageids: number[]) {
             }
 
             // _idを_id_oldに変更（旧カード用DBでの重複を避けるため）
-            const forArchive = [];
+            const forArchive: any[] = [];
             cardsToDelete.forEach(oldCard => {
                 const archiveCard = Object.assign({}, oldCard);
                 archiveCard._id_old = oldCard._id;
