@@ -61,7 +61,7 @@ cp -r /home/stjj-aic/nedb /vagrant/nedb
 
 # URL台帳（Webアプリ）
 ローカル環境の場合は https://localhost の後ろに以下を付ける  
-本番環境の場合は https://api.scptcgjpj.tk の後ろに以下を付ける  
+本番環境の場合は https://api.scptcgjpj.ga の後ろに以下を付ける  
 * /connectivity
   * 接続確認用
   * GET: リクエストパラメータをオウム返しする（はず）

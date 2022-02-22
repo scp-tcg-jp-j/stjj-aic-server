@@ -12,10 +12,11 @@ export async function upsertOne(card: Card) {
             // カード更新の場合は_idを_id_oldに変更（旧カード用DBでの重複を避けるため）
             // _idを_id_oldに変更（旧カード用DBでの重複を避けるため）
             if (oldCard) {
-                oldCard._id_old = oldCard._id
-                delete oldCard._id
+                const archiveCard = Object.assign({}, oldCard);
+                archiveCard._id_old = oldCard._id;
+                delete archiveCard._id
                 // 旧カード用DBに投入
-                const archiveOldResult = await archiveOld(oldCard).catch((reason) => reason)
+                const archiveOldResult = await archiveOld(archiveCard).catch((reason) => reason);
                 if (archiveOldResult instanceof Error) {
                     return reject(archiveOldResult)
                 }
@@ -48,13 +49,16 @@ export async function bulkDelete(deleteTargetCardPageids: number[]) {
             }
 
             // _idを_id_oldに変更（旧カード用DBでの重複を避けるため）
+            const forArchive: any[] = [];
             cardsToDelete.forEach(oldCard => {
-                oldCard._id_old = oldCard._id
-                delete oldCard._id
+                const archiveCard = Object.assign({}, oldCard);
+                archiveCard._id_old = oldCard._id;
+                delete archiveCard._id
+                forArchive.push(archiveCard);
             })
 
             // 旧カード用DBに投入
-            const archiveOldResult = await archiveOld(cardsToDelete).catch((reason) => reason)
+            const archiveOldResult = await archiveOld(forArchive).catch((reason) => reason);
             if (archiveOldResult instanceof Error) {
                 return reject(archiveOldResult)
             }

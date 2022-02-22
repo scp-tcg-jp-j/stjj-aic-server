@@ -35,7 +35,7 @@ export function postUpsertOne(req: Request, res: Response) {
         effect: (raw['effect'] || undefined) as string,
         tags: (raw['tags'] || undefined) as [string, ...string[]],
         banned: (raw['banned'] || undefined) as true,
-        latest_revid: raw['latest_revid'] as number,
+        lastrevid: raw['lastrevid'] as number,
         page_title: (raw['page_title'] || undefined) as string,
     }
 
@@ -73,7 +73,7 @@ export function postBulkDelete(req: Request, res: Response) {
     });
 }
 
-// DBに存在するカードの一覧を取得する（pageidとlatest_revidのペアだけ）
+// DBに存在するカードの一覧を取得する（pageidとlastrevidのペアだけ）
 export function getCurrentCards(req: Request, res: Response) {
     currentCards().then((cards) => {
         // 結果のJSONが大きくなりそうなためログは吐かない（デバッグ用は要検討）

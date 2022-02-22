@@ -90,7 +90,7 @@ if (process.argv.includes('--env=local')) {
     webApp.use(express.urlencoded({ extended: true }))
     // CORS設定（STJJ.AICのフロントエンドに絞る）
     webApp.use(function(req, res, next) {
-        res.header('Access-Control-Allow-Origin', 'https://www.scptcgjpj.tk')
+        res.header('Access-Control-Allow-Origin', 'https://www.scptcgjpj.ga')
         res.header('Access-Control-Allow-Credentials', 'true')
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
         next()
