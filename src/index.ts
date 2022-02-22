@@ -14,7 +14,7 @@ export let BASE_URL_FRONT: string = "";
 
 // 以下、ポートとか証明書とか設定して実行（引数でローカル環境か本番環境か分岐）
 if (process.argv.includes('--env=local')) {
-    BASE_URL = "https://localhost.scptcgjpj.tk";
+    BASE_URL = "https://localhost.scptcgjpj.ga";
     BASE_URL_FRONT = "https://localhost:8080";
     /**
      * 外部公開用Expressアプリ設定（ローカル環境実行用）
@@ -68,8 +68,8 @@ if (process.argv.includes('--env=local')) {
     https.createServer(testcert, webApp).listen(443)
 
 } else if (process.argv.includes('--env=prod')) {
-    BASE_URL = "https://api.scptcgjpj.tk";
-    BASE_URL_FRONT = "https://www.scptcgjpj.tk"
+    BASE_URL = "https://api.scptcgjpj.ga";
+    BASE_URL_FRONT = "https://www.scptcgjpj.ga"
     /**
      * 外部公開用Expressアプリ設定（本番環境実行用）
      */
