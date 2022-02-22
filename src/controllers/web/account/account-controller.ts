@@ -47,7 +47,7 @@ export function postSignup(req: Request, res: Response) {
 
     const msg = {
         to: req.body.email,
-        from: 'noreply@mail.scptcgjpj.tk',
+        from: 'noreply@mail.scptcgjpj.ga',
         subject: 'STJJ.AIC アカウント作成手続き',
         text: html,
         html: html,
@@ -104,7 +104,7 @@ export function postPasswordReset(req: Request, res: Response) {
 
     const msg = {
         to: req.body.email,
-        from: 'noreply@mail.scptcgjpj.tk',
+        from: 'noreply@mail.scptcgjpj.ga',
         subject: 'STJJ.AIC パスワード再登録手続き',
         text: html,
         html: html,
@@ -144,7 +144,7 @@ export function postEmailChange(req: Request, res: Response) {
 
     const msg = {
         to: req.body.email,
-        from: 'noreply@mail.scptcgjpj.tk',
+        from: 'noreply@mail.scptcgjpj.ga',
         subject: 'STJJ.AIC メールアドレス変更手続き',
         text: html,
         html: html,
