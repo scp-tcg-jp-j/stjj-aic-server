@@ -16,13 +16,6 @@ git checkout 【ブランチ名】
 npm install
 ※上記のブランチ名は開発対象で適宜決める。カード検索機能はcard-searchブランチで実装中  
 cd ..  
-git clone git@github.com:scp-tcg-jp-j/scp-tcg-jp-j.github.io.git stjj-aic-front  
-cd stjj-aic-front  
-git fetch origin 【ブランチ名】  
-git checkout 【ブランチ名】  
-※上記のブランチ名は開発対象で適宜決める。カード検索機能はcard-searchブランチで実装中  
-npm install  
-cd ..  
 git clone git@github.com:scp-tcg-jp-j/stjj-aic-vm vagrant  
 cd vagrant  
 vagrant up  
@@ -40,10 +33,6 @@ npx -p typescript tsc
 # ローカル環境でのWebアプリケーションの実行
 先述のビルドを実行したうえで、先述のVM内で以下を実行する  
 nohup sudo -b -u stjj-aic /opt/.nvm/versions/node/v14.15.5/bin/node /var/www/stjj-aic-server/serve/src/index.js --env=local &  
-# ローカル環境でのフロントエンドの実行
-VM「外」のstjj-aic-frontフォルダで以下を実行する  
-au run  
-※https://localhost:8080にアクセスすると見られる  
 # ローカル環境でのFANDOMカード同期Pythonの実行
 todo: 詳細未定  
 おそらく/home/vagrant/repo/stjj-aic-server/pythonを/var/www/stjj-aic-server/pythonにコピーして何かする？  
@@ -52,8 +41,6 @@ VM内で以下を実行する
 ps aux | grep node  
 上記で得たnodeのPIDを以下で殺す（※sudoがついてない方のPID）  
 sudo kill -9 【PID】  
-# ローカル環境でのフロントエンドの実行停止
-CTRL+Cで強制停止  
 # VM内のNeDBのファイルを取り出す
 VM内のNeDBのファイルは/home/stjj-aic/nedbディレクトリに存在する。
 cp -r /home/stjj-aic/nedb /vagrant/nedb
