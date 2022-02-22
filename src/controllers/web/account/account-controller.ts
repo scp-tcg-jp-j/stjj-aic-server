@@ -6,7 +6,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { BASE_URL, BASE_URL_FRONT } from '../../..';
 import { accountDb } from '../../../dao';
 import { sessionService } from '../../../models/services/sessionService';
+import { validationResult, matchedData } from 'express-validator';
 
+// APIキーを入れる
 sgMail.setApiKey('');
 
 export function postUsernameChange(req: Request, res: Response) {
@@ -28,6 +30,15 @@ export function postPasswordChange(req: Request, res: Response) {
 }
 
 export function postSignup(req: Request, res: Response) {
+    logger.info({ email: req.body.email, username: req.body.username })
+
+    // バリデーション実行
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.warn(errors);
+        res.status(400).json({ errors: errors.array() }).send();
+        return
+    }
 
     const token = uuidv4()
     const html = 'この度はSTJJ.AICのアカウント作成ありがとうございます。<br>正式にアカウント作成を終了するには、次のリンクを押してパスワードを登録していただく必要があります。<br><a href="' + BASE_URL_FRONT + '/#/signup-password?token=' + token + '">STJJ.AIC パスワード登録リンク</a><br>※本メールに心当たりのない場合はお手数ですが本メールの破棄をお願いします。'

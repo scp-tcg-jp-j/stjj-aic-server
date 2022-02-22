@@ -1,3 +1,4 @@
+import { upsertPostSignupValidator } from './controllers/web/account/Validators';
 import { Router } from 'express';
 import { postAccountDelete, postEmailChange, postEmailChangeNew, postPasswordChange, postPasswordReset, postPasswordResetNew, postSignup, postSignupPassword, postUsernameChange } from './controllers/web/account/account-controller';
 import { postAllUsers, postEditUsers } from './controllers/web/admin/UserManagerController';
@@ -23,7 +24,7 @@ export function configRoutes(router: Router) {
     router.post('/username-change', postUsernameChange)
     router.post('/password-change', postPasswordChange)
     router.post('/account-delete', postAccountDelete)
-    router.post('/signup', postSignup)
+    router.post('/signup',upsertPostSignupValidator, postSignup)
     router.post('/signup_password', postSignupPassword)
     router.post('/account_delete', postAccountDelete)
     router.post('/password_reset', postPasswordReset)

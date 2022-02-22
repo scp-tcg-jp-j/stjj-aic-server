@@ -154,6 +154,10 @@ export function signupDeque(id: string) {
         return null;
     }
 }
+// todo: queue系は別サービスに分ける（バリデータで使いたいため）
+export function isQueuedSignup(email: string) {
+    return signupQueue.some(item => item.email == email)
+}
 
 let passwordResetQueue: { email: string, id: string }[] = [];
 export function passwordResetEnqueue(item: { email: string, id: string }) {
