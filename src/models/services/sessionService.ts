@@ -1,5 +1,6 @@
 import { Session } from "express-session"
 import { accountDb } from "../../dao";
+import { Account } from "../account"
 
 class SessionService {
     private sessions: Session[]  = []

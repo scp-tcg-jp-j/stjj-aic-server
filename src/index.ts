@@ -36,7 +36,7 @@ if (process.argv.includes('--env=local')) {
     webApp.use(express.urlencoded({ extended: true }))
     // CORS設定
     webApp.use(function(req, res, next) {
-        res.header('Access-Control-Allow-Origin', 'https://localhost:8080')
+        res.header('Access-Control-Allow-Origin', 'https://localhost.scptcgjpj.ga:8080')
         // res.header('Access-Control-Allow-Origin', '*') // todo CORS設定が上記で動くようにする
         res.header('Access-Control-Allow-Credentials', 'true')
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')

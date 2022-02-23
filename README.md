@@ -2,7 +2,6 @@
 
 # 開発の準備
 Node.jsをインストールする（Webアプリとフロントエンドの開発に使うため）  
-aurelia cliをインストールする（フロントエンドの開発に使うため。npm install aurelia-cli -gを実行することで入れられる）  
 VirtualBoxをインストールする（本番環境を模した環境のVMでWebアプリやFANDOMカード同期Pythonを実行するため）  
 Vagrantをインストールする（同上）  
 vagrant-vbguestをインストールする（先述のVM内に開発したソースコードを共有するため。vagrant plugin install vagrant-vbguestを実行することで入れられる）  
