@@ -15,7 +15,7 @@ export let BASE_URL_FRONT: string = "";
 // 以下、ポートとか証明書とか設定して実行（引数でローカル環境か本番環境か分岐）
 if (process.argv.includes('--env=local')) {
     BASE_URL = "https://localhost.scptcgjpj.ga";
-    BASE_URL_FRONT = "https://localhost:8080";
+    BASE_URL_FRONT = "https://localhost.scptcgjpj.ga:8080";
     /**
      * 外部公開用Expressアプリ設定（ローカル環境実行用）
      */
@@ -37,7 +37,6 @@ if (process.argv.includes('--env=local')) {
     // CORS設定
     webApp.use(function(req, res, next) {
         res.header('Access-Control-Allow-Origin', 'https://localhost.scptcgjpj.ga:8080')
-        // res.header('Access-Control-Allow-Origin', '*') // todo CORS設定が上記で動くようにする
         res.header('Access-Control-Allow-Credentials', 'true')
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
         next()

@@ -1,16 +1,19 @@
 import { Request, Response } from 'express'
 import { logger } from '../../../logger'
 import { accountCreate, accountDelete, emailChange, emailChangeDeque, emailChangeEnqueue, passwordChange, passwordReset, passwordResetDeque, passwordResetEnqueue, signupDeque, signupEnqueue, usernameChange } from "../../../models/services/accountCommandService";
-import sgMail from '@sendgrid/mail';
 import { v4 as uuidv4 } from 'uuid';
 import { BASE_URL, BASE_URL_FRONT } from '../../..';
 import { accountDb } from '../../../dao';
 import { sessionService } from '../../../models/services/sessionService';
 import { validationResult, matchedData } from 'express-validator';
+import { sendMail } from '../../../models/services/sendMailService';
 
-// APIキーを入れる
-sgMail.setApiKey('');
-
+/**
+* ユーザ名変更
+* 
+* @param req expressのリクエストオブジェクト
+* @param req expressのレスポンスオブジェクト
+*/
 export function postUsernameChange(req: Request, res: Response) {
     usernameChange({ targetId: (req.session as any).account._id, username: req.body.username }).then(function() {
         res.status(200).json({ result: "ok" }).send()
@@ -20,6 +23,12 @@ export function postUsernameChange(req: Request, res: Response) {
     })
 }
 
+/**
+* パスワード変更
+* 
+* @param req expressのリクエストオブジェクト
+* @param req expressのレスポンスオブジェクト
+*/
 export function postPasswordChange(req: Request, res: Response) {
     passwordChange({ targetId: (req.session as any).account._id, currentPassword: req.body.currentPassword, newPassword: req.body.newPassword }).then(function() {
         res.status(200).json({ result: "ok" }).send()
@@ -29,10 +38,18 @@ export function postPasswordChange(req: Request, res: Response) {
     })
 }
 
+/**
+* サインアップ（ユーザ作成）開始
+* 指定されたメールアドレスに正式登録用のリンクを含んだメールを送信する
+* 誰によるサインアップか識別するためにリンクにはトークンを付与する
+* 
+* @param req expressのリクエストオブジェクト
+* @param req expressのレスポンスオブジェクト
+*/
 export function postSignup(req: Request, res: Response) {
     logger.info({ email: req.body.email, username: req.body.username })
 
-    // バリデーション実行
+    // バリデーション
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         logger.warn(errors);
@@ -45,21 +62,38 @@ export function postSignup(req: Request, res: Response) {
 
     signupEnqueue({ email: req.body.email, username: req.body.username, id: token })
 
-    const msg = {
+    /* const msg = {
         to: req.body.email,
         from: 'noreply@mail.scptcgjpj.ga',
         subject: 'STJJ.AIC アカウント作成手続き',
         text: html,
         html: html,
-    };
-    sgMail.send(msg).then(() => {
+    }; */
+    sendMail(req.body.email, 'STJJ.AIC アカウント作成手続き', html).then((sendMailResult) => {
+        if (sendMailResult.state == "ok") {
+            res.status(200).json({ result: "ok" }).send();
+            return;
+        }
+        logger.error(sendMailResult);
+        res.status(500).json({ result: "ng" }).send();
+    }).catch((reason) => {
+        logger.error(reason);
+        res.status(500).json({ result: "ng" }).send();
+    });
+
+/*     sgMail.send(msg).then(() => {
         res.status(200).json({ result: "ok" }).send()
     }).catch((reason) => {
         logger.error(reason);
         res.status(500).json({ result: "ng" }).send()
-    });
+    }); */
 }
 
+/**
+* サインアップ（ユーザ作成）終了
+* @param req expressのリクエストオブジェクト
+* @param req expressのレスポンスオブジェクト
+*/
 export function postSignupPassword(req: Request, res: Response) {
 
     const reserved = signupDeque(req.body.token)
@@ -100,8 +134,9 @@ export function postPasswordReset(req: Request, res: Response) {
     const token = uuidv4()
     const html = 'STJJ.AICのパスワード再登録が申請されました。<br>正式にパスワード再登録するには、次のリンクを押して新しいパスワードを登録していただく必要があります。<br><a href="' + BASE_URL_FRONT + '/#/password-reset-new?token=' + token + '">STJJ.AIC パスワード再登録</a><br>※本メールに心当たりのない場合はお手数ですが本メールの破棄をお願いします。'
 
-    passwordResetEnqueue({ email: req.body.email,  id: token })
+    passwordResetEnqueue({ email: req.body.email, id: token })
 
+    /*
     const msg = {
         to: req.body.email,
         from: 'noreply@mail.scptcgjpj.ga',
@@ -109,12 +144,28 @@ export function postPasswordReset(req: Request, res: Response) {
         text: html,
         html: html,
     };
+    */
+
+    sendMail(req.body.email, 'STJJ.AIC パスワード再登録手続き', html).then((sendMailResult) => {
+        if (sendMailResult.state == "ok") {
+            res.status(200).json({ result: "ok" }).send();
+            return;
+        }
+        logger.error(sendMailResult);
+        res.status(500).json({ result: "ng" }).send();
+    }).catch((reason) => {
+        logger.error(reason);
+        res.status(500).json({ result: "ng" }).send();
+    });
+
+    /*
     sgMail.send(msg).then(() => {
         res.status(200).json({ result: "ok" }).send()
     }).catch((reason) => {
         logger.error(reason);
         res.status(500).json({ result: "ng" }).send()
     });
+    */
 }
 
 export function postPasswordResetNew(req: Request, res: Response) {
@@ -142,19 +193,30 @@ export function postEmailChange(req: Request, res: Response) {
 
     emailChangeEnqueue({ currentEmail: (req.session as any).account.email, newEmail: req.body.email, id: token })
 
-    const msg = {
+    /* const msg = {
         to: req.body.email,
         from: 'noreply@mail.scptcgjpj.ga',
         subject: 'STJJ.AIC メールアドレス変更手続き',
         text: html,
         html: html,
-    };
-    sgMail.send(msg).then(() => {
+    }; */
+    sendMail(req.body.email, 'STJJ.AIC メールアドレス変更手続き', html).then((sendMailResult) => {
+        if (sendMailResult.state == "ok") {
+            res.status(200).json({ result: "ok" }).send();
+            return;
+        }
+        logger.error(sendMailResult);
+        res.status(500).json({ result: "ng" }).send();
+    }).catch((reason) => {
+        logger.error(reason);
+        res.status(500).json({ result: "ng" }).send();
+    });
+/*     sgMail.send(msg).then(() => {
         res.status(200).json({ result: "ok" }).send()
     }).catch((reason) => {
         logger.error(reason);
         res.status(500).json({ result: "ng" }).send()
-    });
+    }); */
 }
 
 export function postEmailChangeNew(req: Request, res: Response) {
