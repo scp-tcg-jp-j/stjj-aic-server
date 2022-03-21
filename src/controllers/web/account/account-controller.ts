@@ -46,7 +46,7 @@ export function postPasswordChange(req: Request, res: Response) {
 * @param req expressのリクエストオブジェクト
 * @param req expressのレスポンスオブジェクト
 */
-export function postSignup(req: Request, res: Response) {
+export async function postSignup(req: Request, res: Response) {
     logger.info({ email: req.body.email, username: req.body.username })
 
     // バリデーション

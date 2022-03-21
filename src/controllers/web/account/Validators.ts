@@ -1,30 +1,21 @@
-import { NG_USERNAMES, MESSAGE_NG_USERNAME, MESSAGE_IS_STRING, MESSAGE_MALFORMED_USERNAME, MESSAGE_REQUIRED, MESSAGE_IS_EMAIL, MESSAGE_PASSWORD_LENGTH_MIN, MESSAGE_PASSWORD_USE_NUM, MESSAGE_PASSWORD_USE_ALPHABET } from './../../../constants';
+import { NG_USERNAMES, MESSAGE_NG_USERNAME, MESSAGE_IS_STRING, MESSAGE_MALFORMED_USERNAME, MESSAGE_REQUIRED, MESSAGE_IS_EMAIL, MESSAGE_PASSWORD_LENGTH_MIN, MESSAGE_PASSWORD_USE_NUM, MESSAGE_PASSWORD_USE_ALPHABET, MESSAGE_EMAIL_ALREADY_USED } from './../../../constants';
 import { body } from 'express-validator';
 import { findOneAccountByEmail } from '../../../models/services/accountQueryService';
 
 export const upsertPostSignupValidator = [
     body('email').notEmpty().withMessage(MESSAGE_REQUIRED),
     body('email').isEmail().withMessage(MESSAGE_IS_EMAIL),
+    // メアド重複確認
     body('email').custom(email => {
-        return true;
-        // todo メアドが既に使われているかの確認で上手いのを考える。
-
-/*         let waiting = true
-        let alreadyUsed
-        while (waiting) {
+        return new Promise<void>((resolve, reject) => {
             findOneAccountByEmail(email).then(maybeAccount => {
                 if (maybeAccount) {
-                    alreadyUsed = true
+                    reject(MESSAGE_EMAIL_ALREADY_USED);
                 } else {
-                    alreadyUsed = false
+                    resolve();
                 }
-
-                waiting = false
-            })
-            setTimeout(() => {}, 100)
-        }
-
-        return !alreadyUsed */
+            });
+        });
     }),
     body('username').notEmpty().withMessage(MESSAGE_REQUIRED),
     // ユーザー名のNGリストを確認
