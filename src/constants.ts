@@ -9,6 +9,7 @@ export const MESSAGE_IS_ARRAY_OF_STRING = '配列の要素は文字列を入力�
 export const MESSAGE_IS_BOOLEAN = 'bool値を入力してください'
 export const MESSAGE_NG_USERNAME = 'そのユーザー名は利用できません。他のユーザー名で登録してください'
 export const MESSAGE_MALFORMED_USERNAME = 'ユーザー名は半角英数字、半角アンダーバーで登録してください'
+export const MESSAGE_USERNAME_ALREADY_USED = '既に利用されているユーザー名です'
 export const MESSAGE_IS_EMAIL = '不正なメールアドレス形式です'
 export const MESSAGE_EMAIL_ALREADY_USED = '既に利用されているメールアドレスです'
 export const MESSAGE_PASSWORD_LENGTH_MIN = 'パスワードは8文字以上で登録してください'
