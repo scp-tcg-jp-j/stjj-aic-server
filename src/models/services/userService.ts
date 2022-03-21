@@ -10,7 +10,7 @@ export async function findAllUsers() {
     return new Promise<Account[]>((resolve: (account: Account[]) => any, reject: (error: Error) => any) => {
 
         // 検索実行。パスワードが漏れてはいけないので射影で落とす
-        accountDb.find({}, { password: 0 }).sort("created").exec(function (errorOfFind: Error | null, accounts: Account[] | null) {
+        accountDb.find({ $not: { deleted: true } }, { password: 0 }).sort("created").exec(function (errorOfFind: Error | null, accounts: Account[] | null) {
             if (errorOfFind) {
                 // 異常系
                 return reject(errorOfFind)
