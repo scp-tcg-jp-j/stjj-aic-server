@@ -21,6 +21,9 @@ vagrant up
 vagrant ssh  
 ※最後まで成功するとSTJJ.AICをローカル環境で実行するためのVMにログインしているはず  
 ※PCを終了するときはVMでexitとタイプしてVMから離脱し、vagrant haltでVMを停止する。
+証明書をVMに配置する（STJJWikiのGoogle Driveからcert.zipをダウンロードし、中身を/usr/local/ssl/certs/certs.pemと/usr/local/ssl/private/key.pemとして配置する）。
+初期アカウントが入ったDBファイルをVMに配置する（STJJWikiのGoogle Driveから初期アカウントDB.zipをダウンロードし、中身を/home/stjj-aic/nedb/account.nedbとして配置する。所有者・所有グループをstjj-aicに変更する）。
+
 # ローカル環境でのWebアプリケーションのビルド
 先述のVM内で以下を実行する  
 cp -r /home/vagrant/repo/stjj-aic-server/src /var/www/stjj-aic-server  
@@ -29,17 +32,21 @@ cp /home/vagrant/repo/stjj-aic-server/tsconfig.json /var/www/stjj-aic-server/tsc
 cd /var/www/stjj-aic-server  
 npm install  
 npx -p typescript tsc  
+
 # ローカル環境でのWebアプリケーションの実行
 先述のビルドを実行したうえで、先述のVM内で以下を実行する  
 nohup sudo -b -u stjj-aic /opt/.nvm/versions/node/v14.15.5/bin/node /var/www/stjj-aic-server/serve/src/index.js --env=local &  
+
 # ローカル環境でのFANDOMカード同期Pythonの実行
 todo: 詳細未定  
 おそらく/home/vagrant/repo/stjj-aic-server/pythonを/var/www/stjj-aic-server/pythonにコピーして何かする？  
+
 # ローカル環境でのWebアプリケーションの停止
 VM内で以下を実行する  
 ps aux | grep node  
 上記で得たnodeのPIDを以下で殺す（※sudoがついてない方のPID）  
 sudo kill -9 【PID】  
+
 # VM内のNeDBのファイルを取り出す
 VM内のNeDBのファイルは/home/stjj-aic/nedbディレクトリに存在する。
 cp -r /home/stjj-aic/nedb /vagrant/nedb
