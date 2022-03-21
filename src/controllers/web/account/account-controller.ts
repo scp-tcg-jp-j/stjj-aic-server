@@ -62,13 +62,6 @@ export function postSignup(req: Request, res: Response) {
 
     signupEnqueue({ email: req.body.email, username: req.body.username, id: token })
 
-    /* const msg = {
-        to: req.body.email,
-        from: 'noreply@mail.scptcgjpj.ga',
-        subject: 'STJJ.AIC アカウント作成手続き',
-        text: html,
-        html: html,
-    }; */
     sendMail(req.body.email, 'STJJ.AIC アカウント作成手続き', html).then((sendMailResult) => {
         if (sendMailResult.state == "ok") {
             res.status(200).json({ result: "ok" }).send();
@@ -81,12 +74,6 @@ export function postSignup(req: Request, res: Response) {
         res.status(500).json({ result: "ng" }).send();
     });
 
-/*     sgMail.send(msg).then(() => {
-        res.status(200).json({ result: "ok" }).send()
-    }).catch((reason) => {
-        logger.error(reason);
-        res.status(500).json({ result: "ng" }).send()
-    }); */
 }
 
 /**
@@ -95,6 +82,14 @@ export function postSignup(req: Request, res: Response) {
 * @param req expressのレスポンスオブジェクト
 */
 export function postSignupPassword(req: Request, res: Response) {
+
+    // バリデーション
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.warn(errors);
+        res.status(400).json({ errors: errors.array() }).send();
+        return
+    }
 
     const reserved = signupDeque(req.body.token)
     if (reserved) {
@@ -136,16 +131,6 @@ export function postPasswordReset(req: Request, res: Response) {
 
     passwordResetEnqueue({ email: req.body.email, id: token })
 
-    /*
-    const msg = {
-        to: req.body.email,
-        from: 'noreply@mail.scptcgjpj.ga',
-        subject: 'STJJ.AIC パスワード再登録手続き',
-        text: html,
-        html: html,
-    };
-    */
-
     sendMail(req.body.email, 'STJJ.AIC パスワード再登録手続き', html).then((sendMailResult) => {
         if (sendMailResult.state == "ok") {
             res.status(200).json({ result: "ok" }).send();
@@ -158,14 +143,6 @@ export function postPasswordReset(req: Request, res: Response) {
         res.status(500).json({ result: "ng" }).send();
     });
 
-    /*
-    sgMail.send(msg).then(() => {
-        res.status(200).json({ result: "ok" }).send()
-    }).catch((reason) => {
-        logger.error(reason);
-        res.status(500).json({ result: "ng" }).send()
-    });
-    */
 }
 
 export function postPasswordResetNew(req: Request, res: Response) {
@@ -193,13 +170,6 @@ export function postEmailChange(req: Request, res: Response) {
 
     emailChangeEnqueue({ currentEmail: (req.session as any).account.email, newEmail: req.body.email, id: token })
 
-    /* const msg = {
-        to: req.body.email,
-        from: 'noreply@mail.scptcgjpj.ga',
-        subject: 'STJJ.AIC メールアドレス変更手続き',
-        text: html,
-        html: html,
-    }; */
     sendMail(req.body.email, 'STJJ.AIC メールアドレス変更手続き', html).then((sendMailResult) => {
         if (sendMailResult.state == "ok") {
             res.status(200).json({ result: "ok" }).send();
@@ -211,12 +181,6 @@ export function postEmailChange(req: Request, res: Response) {
         logger.error(reason);
         res.status(500).json({ result: "ng" }).send();
     });
-/*     sgMail.send(msg).then(() => {
-        res.status(200).json({ result: "ok" }).send()
-    }).catch((reason) => {
-        logger.error(reason);
-        res.status(500).json({ result: "ng" }).send()
-    }); */
 }
 
 export function postEmailChangeNew(req: Request, res: Response) {
