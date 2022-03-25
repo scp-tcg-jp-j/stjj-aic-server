@@ -6,12 +6,12 @@ export async function currentCards() {
     return new Promise<{ pageid: number, lastrevid: number }[]>((resolve, reject) => 
         cardDb.find({}, { _id: 0, pageid: 1, lastrevid: 1 }, function (errorOfFind, cards) {
             if (errorOfFind) {
-                return reject(errorOfFind)
+                return reject(errorOfFind);
             }
 
-            return resolve(cards)
+            return resolve(cards);
         })
-    )
+    );
 }
 
 // todo: コントローラ書いて繋げて動かしてみる
@@ -21,12 +21,12 @@ export async function find(query: any, projection: any, sort: any, skip: number,
         (resolve: (cards: Card[]) => any, reject: (error: Error) => any) => 
             cardDb.find(query, projection).sort(sort).skip(skip).limit(limit).exec(function (err, cards) {
                 if (err) {
-                    return reject(err)
+                    return reject(err);
                 }
 
-                return resolve(cards)
+                return resolve(cards);
             })
-    )
+    );
 }
 
 // カード検索（まんまNeDBのクエリが動くのであまりよろしくない）
@@ -35,12 +35,12 @@ export async function findAll(query: any, projection: any, sort: any) {
         (resolve: (cards: Card[]) => any, reject: (error: Error) => any) => 
             cardDb.find(query, projection).sort(sort).exec(function (err, cards) {
                 if (err) {
-                    return reject(err)
+                    return reject(err);
                 }
 
-                return resolve(cards)
+                return resolve(cards);
             })
-    )
+    );
 }
 
 export async function count(query: any) {
@@ -48,10 +48,10 @@ export async function count(query: any) {
         (resolve: (count: number) => any, reject: (error: Error) => any) => 
             cardDb.count(query).exec(function (err, count) {
                 if (err) {
-                    return reject(err)
+                    return reject(err);
                 }
 
-                return resolve(count)
+                return resolve(count);
             })
-    )
+    );
 }

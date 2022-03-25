@@ -11,7 +11,7 @@ export async function findOneAccount(_id: string) {
                 { banned: false },
                 { $not: { deleted: true } }
             ]
-        }
+        };
         accountDb.findOne(query, { password: 0 }, function (errorOfFind: Error | null, account: Account | null) {
             if (errorOfFind) {
                 console.log(errorOfFind);
@@ -19,13 +19,13 @@ export async function findOneAccount(_id: string) {
             }
 
             if (account == null) {
-                console.log("account not found")
-                return reject(new Error("account not found"))
+                console.log("account not found");
+                return reject(new Error("account not found"));
             }
 
             return resolve(account);
-        })
-    })
+        });
+    });
 }
 
 export async function findOneAccountByEmail(email: string) {
@@ -36,7 +36,7 @@ export async function findOneAccountByEmail(email: string) {
                 { banned: false },
                 { $not: { deleted: true } }
             ]
-        }
+        };
         accountDb.findOne(query, { password: 0 }, function (errorOfFind: Error | null, account: Account | null) {
             if (errorOfFind) {
                 console.log(errorOfFind);
@@ -44,7 +44,7 @@ export async function findOneAccountByEmail(email: string) {
             }
 
             if (account == null) {
-                return resolve(null)
+                return resolve(null);
             }
 
             return resolve(account);
@@ -60,7 +60,7 @@ export async function findOneAccountByUsername(username: string) {
                 { banned: false },
                 { $not: { deleted: true } }
             ]
-        }
+        };
         accountDb.findOne(query, { password: 0 }, function (errorOfFind: Error | null, account: Account | null) {
             if (errorOfFind) {
                 console.log(errorOfFind);
@@ -68,10 +68,10 @@ export async function findOneAccountByUsername(username: string) {
             }
 
             if (account == null) {
-                return resolve(null)
+                return resolve(null);
             }
 
             return resolve(account);
-        })
-    })
+        });
+    });
 }

@@ -1,5 +1,5 @@
-import winston = require('winston')
-import DailyRotateFile = require('winston-daily-rotate-file')
+import winston = require('winston');
+import DailyRotateFile = require('winston-daily-rotate-file');
 
 // ロガー生成
 export const logger = winston.createLogger({

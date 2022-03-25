@@ -1,11 +1,11 @@
-import { Request, Response } from 'express'
-import { accountDb } from '../../../dao'
+import { Request, Response } from 'express';
+import { accountDb } from '../../../dao';
 import bcrypt from "bcrypt";
 
 // 接続確認用コントローラ（GET）
 export function getConnectivityCheck(req: Request, res: Response) {
 
-    res.status(200).json({ result: (req.session as any).userId ? "セッション有効" : "セッション無効" }).send()
+    res.status(200).json({ result: (req.session as any).userId ? "セッション有効" : "セッション無効" }).send();
 
     /*
     const users: any[] = [];
@@ -34,5 +34,5 @@ export function getConnectivityCheck(req: Request, res: Response) {
 
 // 接続確認用コントローラ（POST）
 export function postConnectivityCheck(req: Request, res: Response) {
-    res.status(200).json(req.body).send()
+    res.status(200).json(req.body).send();
 }

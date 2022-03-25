@@ -1,9 +1,9 @@
-import { Session } from "express-session"
+import { Session } from "express-session";
 import { accountDb } from "../../dao";
-import { Account } from "../account"
+import { Account } from "../account";
 
 class SessionService {
-    private sessions: Session[]  = []
+    private sessions: Session[]  = [];
 
     public addSession(session: Session) {
         this.sessions.push(session);
@@ -19,7 +19,7 @@ class SessionService {
         // todo: 排他制御ちゃんとやる
         const target = this.sessions.filter(session => (session as any).account?._id == _id);
         this.sessions = this.sessions.filter(session => (session as any).account?.id != _id);
-        target.forEach(session => session.destroy(() => {}))
+        target.forEach(session => session.destroy(() => {}));
     }
 
     // アカウント情報弄った後にセッションに反映
@@ -27,24 +27,23 @@ class SessionService {
         accountDb.findOne({ _id: _id }, { password: 0 }, (err: Error | null, account: Account | null) => {
             if (err) {
                 // todo: 異常系を考える
-                console.log(err)
+                console.log(err);
                 return false;
             }
 
             if (account == null) {
                 // todo: 異常系を考える
-                console.log("account is null(sessionService)")
+                console.log("account is null(sessionService)");
                 return false;
             }
-            this.sessions.filter(session => (session as any).account?._id == _id).forEach(
-                session => {
-                    (session as any).account = account
-                }
-            )
+            this.sessions.filter(session => (session as any).account?._id == _id)
+            .forEach(session => {
+                    (session as any).account = account;
+            });
 
             return true;
-        })
+        });
     }
 }
 
-export const sessionService = new SessionService()
+export const sessionService = new SessionService();

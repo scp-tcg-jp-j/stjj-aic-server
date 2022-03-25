@@ -1,24 +1,24 @@
-export const MESSAGE_REQUIRED = '必ず入力してください'
-export const MESSAGE_IS_INT = '整数を入力してください'
-export const MESSAGE_IS_STRING = '文字列を入力してください'
-export const MESSAGE_IS_NUMERIC = '数値を入力してください'
-export const MESSAGE_IS_OC = 'STJJのオブジェクトクラスとして利用可能なものを入力してください'
-export const MESSAGE_IS_MAINTYPE = 'STJJのメインタイプとして利用可能なものを入力してください'
-export const MESSAGE_IS_ARRAY = '配列を入力してください'
-export const MESSAGE_IS_ARRAY_OF_STRING = '配列の要素は文字列を入力してください'
-export const MESSAGE_IS_BOOLEAN = 'bool値を入力してください'
-export const MESSAGE_NG_USERNAME = 'そのユーザー名は利用できません。他のユーザー名で登録してください'
-export const MESSAGE_MALFORMED_USERNAME = 'ユーザー名は半角英数字、半角アンダーバーで登録してください'
-export const MESSAGE_USERNAME_ALREADY_USED = '既に利用されているユーザー名です'
-export const MESSAGE_IS_EMAIL = '不正なメールアドレス形式です'
-export const MESSAGE_EMAIL_ALREADY_USED = '既に利用されているメールアドレスです'
-export const MESSAGE_PASSWORD_LENGTH_MIN = 'パスワードは8文字以上で登録してください'
-export const MESSAGE_PASSWORD_USE_NUM = 'パスワードには半角数字を最低1文字入れてください'
-export const MESSAGE_PASSWORD_USE_ALPHABET = 'パスワードには半角英字を最低1文字入れてください'
+export const MESSAGE_REQUIRED = '必ず入力してください';
+export const MESSAGE_IS_INT = '整数を入力してください';
+export const MESSAGE_IS_STRING = '文字列を入力してください';
+export const MESSAGE_IS_NUMERIC = '数値を入力してください';
+export const MESSAGE_IS_OC = 'STJJのオブジェクトクラスとして利用可能なものを入力してください';
+export const MESSAGE_IS_MAINTYPE = 'STJJのメインタイプとして利用可能なものを入力してください';
+export const MESSAGE_IS_ARRAY = '配列を入力してください';
+export const MESSAGE_IS_ARRAY_OF_STRING = '配列の要素は文字列を入力してください';
+export const MESSAGE_IS_BOOLEAN = 'bool値を入力してください';
+export const MESSAGE_NG_USERNAME = 'そのユーザー名は利用できません。他のユーザー名で登録してください';
+export const MESSAGE_MALFORMED_USERNAME = 'ユーザー名は半角英数字、半角アンダーバーで登録してください';
+export const MESSAGE_USERNAME_ALREADY_USED = '既に利用されているユーザー名です';
+export const MESSAGE_IS_EMAIL = '不正なメールアドレス形式です';
+export const MESSAGE_EMAIL_ALREADY_USED = '既に利用されているメールアドレスです';
+export const MESSAGE_PASSWORD_LENGTH_MIN = 'パスワードは8文字以上で登録してください';
+export const MESSAGE_PASSWORD_USE_NUM = 'パスワードには半角数字を最低1文字入れてください';
+export const MESSAGE_PASSWORD_USE_ALPHABET = 'パスワードには半角英字を最低1文字入れてください';
 
-export const SALT_ROUNDS = 10
+export const SALT_ROUNDS = 10;
 
-export const ERROR_AUTHENTICATION_FAILED = new Error() // 正常系で認証失敗した場合のエラー用オブジェクト
+export const ERROR_AUTHENTICATION_FAILED = new Error(); // 正常系で認証失敗した場合のエラー用オブジェクト
 
 export const NG_USERNAMES = [
   "index",
@@ -219,4 +219,4 @@ export const NG_USERNAMES = [
   "ldap-status",
   "server-info",
   "svn",
-]
+];

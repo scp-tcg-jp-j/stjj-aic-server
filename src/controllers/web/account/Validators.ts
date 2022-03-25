@@ -46,4 +46,4 @@ export const upsertPostSignupPasswordValidator = [
     body('password').matches(/\d/).withMessage(MESSAGE_PASSWORD_USE_NUM),
     // パスワードに半角英字があるかチェック
     body('password').matches(/[A-Za-z]/).withMessage(MESSAGE_PASSWORD_USE_ALPHABET),
-]
+];

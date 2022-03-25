@@ -1,28 +1,27 @@
 import { sessionService } from './../../../models/services/sessionService';
-import { Request, Response } from 'express'
-import { count, find, findAll } from '../../../models/services/cardQueryService'
-import { logger } from '../../../logger'
-import { login } from '../../../models/services/authenticationService'
-import { LoginInfo } from '../../../models/loginInfo'
+import { Request, Response } from 'express';
+import { count, find, findAll } from '../../../models/services/cardQueryService';
+import { logger } from '../../../logger';
+import { login } from '../../../models/services/authenticationService';
+import { LoginInfo } from '../../../models/loginInfo';
 import { findOneAccount } from '../../../models/services/accountQueryService';
 
 // ログインコントローラ（POST）
 export function postLogin(req: Request, res: Response) {
-    logger.info("postLogin called")
-    logger.info(req.body)
+    logger.info("postLogin called");
+    logger.info(req.body);
 
-    login(new LoginInfo(req.body.usernameOrEmail, req.body.password)).then(account => {
+    login(new LoginInfo(req.body.usernameOrEmail, req.body.password))
+    .then(account => {
         logger.info("ログイン成功");
         console.log(req.session.id);
         (req.session as any).account = account;
-        sessionService.addSession(req.session)
-        res.status(200).json({ result: "ok", account: account }).send()
-    }).catch(
-        () => { 
-            logger.info("ログイン失敗")
-            res.status(401).json({ result: "ng" }).send()
-        }
-    )
+        sessionService.addSession(req.session);
+        res.status(200).json({ result: "ok", account: account }).send();
+    }).catch(() => { 
+        logger.info("ログイン失敗");
+        res.status(401).json({ result: "ng" }).send();
+    })
 
     /*
     logger.info("NeDBへのクエリが正常終了しました")
@@ -34,31 +33,28 @@ export function postLogin(req: Request, res: Response) {
 
 export function postSession(req: Request, res: Response) {
     console.log("セッションチェック");
-    console.log(req.session.id)
+    console.log(req.session.id);
     if ((req.session as any).account) {
-        findOneAccount((req.session as any).account._id).then(
-            account => {
-                res.status(200).json({ alive: true, account: account }).send()
-            }
-        ).catch(
-            () => {
-                // todo: 異常系を考える
-                res.status(200).json({ alive: false }).send()                
-            }
-        )
+        findOneAccount((req.session as any).account._id)
+        .then(account => {
+            res.status(200).json({ alive: true, account: account }).send();
+        }).catch(() => {
+            // todo: 異常系を考える
+            res.status(200).json({ alive: false }).send();
+        });
     } else {
-        res.status(200).json({ alive: false }).send()
+        res.status(200).json({ alive: false }).send();
     }
 }
 
 export function postLogout(req: Request, res: Response) {
-    logger.info("postLogout called")
+    logger.info("postLogout called");
     req.session.destroy((err) => {
         // todo: 異常系を考える
-        res.status(200).json({ result: "ok" }).send()
-    })
+        res.status(200).json({ result: "ok" }).send();
+    });
 }
 
 function escapeRegex(targetString: string) {
-    return targetString.replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&')
+    return targetString.replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&');
 }

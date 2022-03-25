@@ -21,28 +21,28 @@ export async function login(loginInfo: LoginInfo) {
                 },
                 { banned: false },
                 { $not: { deleted: true } },
-                { $where: function () { return bcrypt.compareSync(loginInfo.password, (this as unknown as { password: string }).password ) } }
+                { $where: function () { return bcrypt.compareSync(loginInfo.password, (this as unknown as { password: string }).password ); } }
             ]
-        }
+        };
 
         // 検索のコールバック
         const afterFind = async function (errorOfFind: Error | null, account: Account | null) {
             if (errorOfFind) {
                 // 異常系
-                return reject(errorOfFind)
+                return reject(errorOfFind);
             }
 
             if (account == null) {
                 // メアドかユーザー名かパスワードが間違っている場合
-                return reject(ERROR_AUTHENTICATION_FAILED)
+                return reject(ERROR_AUTHENTICATION_FAILED);
             }
 
-            return resolve(account)
-        }
+            return resolve(account);
+        };
 
         // 検索実行。パスワードが漏れてはいけないので射影で落とす
-        accountDb.findOne(query, { password: 0 }, afterFind)
-    })
+        accountDb.findOne(query, { password: 0 }, afterFind);
+    });
 }
 
 

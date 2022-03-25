@@ -6,7 +6,7 @@ export async function upsertOne(card: Card) {
     return new Promise<void>((resolve, reject) => 
         cardDb.find({ pageid: card.pageid }).exec(async function (errorOfFind, oldCard: any) {
             if (errorOfFind) {
-                return reject(errorOfFind)
+                return reject(errorOfFind);
             }
 
             // カード更新の場合は_idを_id_oldに変更（旧カード用DBでの重複を避けるため）
@@ -14,27 +14,27 @@ export async function upsertOne(card: Card) {
             if (oldCard) {
                 const archiveCard = Object.assign({}, oldCard);
                 archiveCard._id_old = oldCard._id;
-                delete archiveCard._id
+                delete archiveCard._id;
                 // 旧カード用DBに投入
                 const archiveOldResult = await archiveOld(archiveCard).catch((reason) => reason);
                 if (archiveOldResult instanceof Error) {
-                    return reject(archiveOldResult)
+                    return reject(archiveOldResult);
                 }
             }
 
             // DB変更用オブジェクトの生成
-            const upsertSetter = card
-            const upsertUnsetter = { cost: true, attack: true, oc: true, subtypes: true, effect: true, tags: true, page_title: true, } as any
-            Object.keys(card).forEach(key => delete upsertUnsetter[key])
+            const upsertSetter = card;
+            const upsertUnsetter = { cost: true, attack: true, oc: true, subtypes: true, effect: true, tags: true, page_title: true, } as any;
+            Object.keys(card).forEach(key => delete upsertUnsetter[key]);
 
             cardDb.update({ pageid: card.pageid }, { $set: upsertSetter, $unset: upsertUnsetter }, { upsert: true }, function (errorOfUpsert) {
                 if (errorOfUpsert) {
-                    return reject(errorOfUpsert)
+                    return reject(errorOfUpsert);
                 }
                 // NeDBのコンパクション実行
-                cardDb.persistence.compactDatafile()
-                return resolve()
-            })
+                cardDb.persistence.compactDatafile();
+                return resolve();
+            });
         })
     )
 }
@@ -45,7 +45,7 @@ export async function bulkDelete(deleteTargetCardPageids: number[]) {
         // 削除対象のカードを抽出
         cardDb.find({ pageid: { $in: deleteTargetCardPageids } }).exec(async function (errorOfFind, cardsToDelete) {
             if (errorOfFind) {
-                return reject(errorOfFind)
+                return reject(errorOfFind);
             }
 
             // _idを_id_oldに変更（旧カード用DBでの重複を避けるため）
@@ -53,27 +53,27 @@ export async function bulkDelete(deleteTargetCardPageids: number[]) {
             cardsToDelete.forEach(oldCard => {
                 const archiveCard = Object.assign({}, oldCard);
                 archiveCard._id_old = oldCard._id;
-                delete archiveCard._id
+                delete archiveCard._id;
                 forArchive.push(archiveCard);
             })
 
             // 旧カード用DBに投入
             const archiveOldResult = await archiveOld(forArchive).catch((reason) => reason);
             if (archiveOldResult instanceof Error) {
-                return reject(archiveOldResult)
+                return reject(archiveOldResult);
             }
 
             // 現カード用DBから削除
             cardDb.remove({ pageid: { $in: cardsToDelete.map(oldCard => oldCard.pageid) } }, { multi: true }, function (errorOfDelete, deletedCardsCount) {
                 if (errorOfDelete) {
-                    return reject(errorOfDelete)
+                    return reject(errorOfDelete);
                 }
                 // NeDBのコンパクション実行
-                cardDb.persistence.compactDatafile()
-                return resolve(deletedCardsCount)
-            })
+                cardDb.persistence.compactDatafile();
+                return resolve(deletedCardsCount);
+            });
         })
-    )
+    );
 }
 
 // 旧カード用DBに投入
@@ -81,11 +81,11 @@ async function archiveOld(docOrDocs: any): Promise<void> {
     return new Promise((resolve, reject) => {
         oldCardDb.insert(docOrDocs, function (errorOfInsert) {
             if (errorOfInsert) {
-                return reject(errorOfInsert)
+                return reject(errorOfInsert);
             }
             // NeDBのコンパクション実行
-            oldCardDb.persistence.compactDatafile()
-            return resolve()
-        })
-    })
+            oldCardDb.persistence.compactDatafile();
+            return resolve();
+        });
+    });
 }

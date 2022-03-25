@@ -1,29 +1,29 @@
-import { Request, Response } from 'express'
-import { count, find, findAll } from '../../../models/services/cardQueryService'
-import { logger } from '../../../logger'
+import { Request, Response } from 'express';
+import { count, find, findAll } from '../../../models/services/cardQueryService';
+import { logger } from '../../../logger';
 
 // カード検索コントローラ（POST）
 export function postFindCards(req: Request, res: Response) {
-    logger.info("postFindCards called")
+    logger.info("postFindCards called");
     // NeDB用のクエリ
-    let rootAndQuery = []
+    let rootAndQuery = [];
     // メインタイプ
     // todo クエリに改善の余地があるかもしれない。配列のマッチについて調べること。
     let maintypesQuery = {
         $or: (req.body.maintypes as any[]).map(maintype => ({
             maintypes: { $elemMatch: maintype }
         }))
-    }
-    rootAndQuery.push(maintypesQuery)
+    };
+    rootAndQuery.push(maintypesQuery);
     // サブタイプ（※未入力の場合は絞り込まない）
     // todo クエリに改善の余地があるかもしれない。配列のマッチについて調べること。
     let subtypesQuery = {
         $or: (req.body.subtypes as any[]).map(subtype => ({
             subtypes: { $elemMatch: subtype }
         }))
-    }
+    };
     if (subtypesQuery.$or.length != 0) {
-        rootAndQuery.push(subtypesQuery)
+        rootAndQuery.push(subtypesQuery);
     }
 
     // カード名（OR）
@@ -32,7 +32,7 @@ export function postFindCards(req: Request, res: Response) {
             $or: (req.body.cardName as string[]).map(flagment => ({
                 name: { $regex: new RegExp(escapeRegex(flagment)) },
             }))
-        })
+        });
     }
     // 効果（OR）
     if (req.body.effect) {
@@ -40,7 +40,7 @@ export function postFindCards(req: Request, res: Response) {
             $or: (req.body.effect as string[]).map(flagment => ({
                 effect: { $regex: new RegExp(escapeRegex(flagment)) }
             }))
-        })
+        });
     }
     // 永久収容（falseの場合は永久収容カードを除く）
     if (!req.body.banned) {
@@ -48,20 +48,20 @@ export function postFindCards(req: Request, res: Response) {
             $not: {
                 banned: true
             }
-        })
+        });
     }
     // オブジェクト特有の項目ここから
     if ((req.body.maintypes as any[]).some(maintype => maintype == 'オブジェクト')) {
-        let objectOrQuery = [] // オブジェクトでない場合にオブジェクト向けの絞り込みで弾かれるのを防ぐためのクッション
-        objectOrQuery.push({ $not: { maintypes: { $elemMatch: 'オブジェクト' } } })
-        let objectAndQuery = [] // オブジェクトの場合に該当すべき条件
+        let objectOrQuery = []; // オブジェクトでない場合にオブジェクト向けの絞り込みで弾かれるのを防ぐためのクッション
+        objectOrQuery.push({ $not: { maintypes: { $elemMatch: 'オブジェクト' } } });
+        let objectAndQuery = []; // オブジェクトの場合に該当すべき条件
         // OC
         if (req.body.oc) {
             objectAndQuery.push({
                 oc: {
                     $in: req.body.oc
                 }
-            })
+            });
         }
         // 確保力（最小）
         if (Number.isFinite(req.body.attackMin)) {
@@ -69,7 +69,7 @@ export function postFindCards(req: Request, res: Response) {
                 attack: {
                     $gte: req.body.attackMin
                 }
-            })
+            });
         }
         // 確保力（最大）
         if (Number.isFinite(req.body.attackMax)) {
@@ -77,11 +77,11 @@ export function postFindCards(req: Request, res: Response) {
                 attack: {
                     $lte: req.body.attackMax
                 }
-            })
+            });
         }
         // 確保力無限大または無し
         if (!req.body.attackSpecial) {
-            objectAndQuery.push({ attack: { $exists: true } })
+            objectAndQuery.push({ attack: { $exists: true } });
         }
         // コスト（最小）
         if (Number.isFinite(req.body.costMin)) {
@@ -89,7 +89,7 @@ export function postFindCards(req: Request, res: Response) {
                 cost: {
                     $gte: req.body.costMin
                 }
-            })
+            });
         }
         // コスト（最大）
         if (Number.isFinite(req.body.costMax)) {
@@ -97,28 +97,28 @@ export function postFindCards(req: Request, res: Response) {
                 cost: {
                     $lte: req.body.costMax
                 }
-            })
+            });
         }
         // コスト無限大または無し
         if (!req.body.costSpecial) {
-            objectAndQuery.push({ cost: { $exists: true } })
+            objectAndQuery.push({ cost: { $exists: true } });
         }
         // タグ（AND）
         if (req.body.tags) {
             (req.body.tags as string[]).forEach(tag => {
                 rootAndQuery.push({
                     tags: tag
-                })
+                });
             });
         }
 
-        objectOrQuery.push({ $and: objectAndQuery })
-        rootAndQuery.push({ $or: objectOrQuery })
+        objectOrQuery.push({ $and: objectAndQuery });
+        rootAndQuery.push({ $or: objectOrQuery });
     }
     // ここまで
     let query = {
         $and: rootAndQuery
-    }
+    };
 
     const projectionMapper = [
         { key: 1, column: "maintypes" }, 
@@ -128,12 +128,12 @@ export function postFindCards(req: Request, res: Response) {
         { key: 5, column: "cost" },
         { key: 6, column: "effect" },
         { key: 7, column: "tags" },
-    ]
+    ];
 
     let projectionBase = { name: 1, page_title: 1 };
     (req.body.projections as number[]).map(key => projectionMapper.find(mapper => mapper.key == key)?.column as string).forEach(column => {
-        Object.assign(projectionBase, { [column]: 1 })
-    })
+        Object.assign(projectionBase, { [column]: 1 });
+    });
 
     const sortMapper = [
         { key: "name_asc", sort: { name: 1 } },
@@ -142,42 +142,42 @@ export function postFindCards(req: Request, res: Response) {
         { key: "name_desc", sort: { name: -1 } },
         { key: "attack_desc", sort: { attack: -1 } },
         { key: "cost_desc", sort: { cost: -1 } },
-    ]
+    ];
 
-    let sort = sortMapper.find(mapper => mapper.key == req.body.sort)?.sort
+    let sort = sortMapper.find(mapper => mapper.key == req.body.sort)?.sort;
 
-    logger.info("----------")
-    logger.info(JSON.stringify(query))
-    logger.info("----------")
-    logger.info("pageSize:" + req.body.pageSize)
-    logger.info("page:" + req.body.page)
-    logger.info("sort:" + req.body.sort)
-    logger.info("projection:" + JSON.stringify(req.body.projections))
+    logger.info("----------");
+    logger.info(JSON.stringify(query));
+    logger.info("----------");
+    logger.info("pageSize:" + req.body.pageSize);
+    logger.info("page:" + req.body.page);
+    logger.info("sort:" + req.body.sort);
+    logger.info("projection:" + JSON.stringify(req.body.projections));
     if (req.body.pageSize == '') {
         findAll(query, projectionBase, sort).then(cards => {
             count(query).then(cardCount => {
-                logger.info("NeDBへのクエリが正常終了しました")
-                res.status(200).json({ cards: cards, count: cardCount }).send()
-            })
+                logger.info("NeDBへのクエリが正常終了しました");
+                res.status(200).json({ cards: cards, count: cardCount }).send();
+            });
         }).catch((reason) => {
-            logger.error(reason)
-            res.status(500).send()
-        })
+            logger.error(reason);
+            res.status(500).send();
+        });
     } else {
-        const pageSize = Number.parseInt(req.body.pageSize)
-        const skip = req.body.page * pageSize
+        const pageSize = Number.parseInt(req.body.pageSize);
+        const skip = req.body.page * pageSize;
         find(query, projectionBase, sort, skip, pageSize).then(cards => {
             count(query).then(cardCount => {
-                logger.info("NeDBへのクエリが正常終了しました")
-                res.status(200).json({ cards: cards, count: cardCount }).send()
-            })
+                logger.info("NeDBへのクエリが正常終了しました");
+                res.status(200).json({ cards: cards, count: cardCount }).send();
+            });
         }).catch((reason) => {
-            logger.error(reason)
-            res.status(500).send()
-        })
+            logger.error(reason);
+            res.status(500).send();
+        });
     }
 }
 
 function escapeRegex(targetString: string) {
-    return targetString.replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&')
+    return targetString.replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&');
 }

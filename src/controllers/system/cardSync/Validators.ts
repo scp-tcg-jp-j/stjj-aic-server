@@ -1,6 +1,6 @@
 import { MESSAGE_REQUIRED, MESSAGE_IS_INT, MESSAGE_IS_STRING, MESSAGE_IS_NUMERIC, MESSAGE_IS_ARRAY, MESSAGE_IS_ARRAY_OF_STRING, MESSAGE_IS_BOOLEAN } from '../../../constants';
-import { assertsIsMainType, assertsIsOc } from '../../../models/card'
-import { body } from 'express-validator'
+import { assertsIsMainType, assertsIsOc } from '../../../models/card';
+import { body } from 'express-validator';
 
 /**
  * FANDOMカード同期のバリデータ
@@ -23,8 +23,8 @@ export const upsertOneValidator = [
     body('attack').optional({ nullable: true }).isNumeric().withMessage(MESSAGE_IS_NUMERIC),
     // オブジェクトがSTJJのOCかチェック
     body('oc').optional({ nullable: true }).custom(oc => {
-        assertsIsOc(oc)
-        return true
+        assertsIsOc(oc);
+        return true;
     }),
     // todo: リザレクションがCanonではなくカノンで入ってくるので一旦切ってる
     /*
@@ -38,10 +38,10 @@ export const upsertOneValidator = [
     body('subtypes').optional({ nullable: true }).isArray().withMessage(MESSAGE_IS_ARRAY).custom(subtypes => {
         (subtypes as Array<any>).forEach(subtype => {
             if (typeof subtype !== 'string') {
-                throw Error(MESSAGE_IS_ARRAY_OF_STRING)
+                throw Error(MESSAGE_IS_ARRAY_OF_STRING);
             }
         })
-        return true
+        return true;
     }),
     // 効果の文字列チェック
     body('effect').optional({ nullable: true }).isString().withMessage(MESSAGE_IS_STRING),
@@ -49,10 +49,10 @@ export const upsertOneValidator = [
     body('tags').optional({ nullable: true }).isArray().withMessage(MESSAGE_IS_ARRAY).custom(tags => {
         (tags as Array<any>).forEach(tag => {
             if (typeof tag !== 'string') {
-                throw Error(MESSAGE_IS_ARRAY_OF_STRING)
+                throw Error(MESSAGE_IS_ARRAY_OF_STRING);
             }
         })
-        return true
+        return true;
     }),
     // 永久収容の真理値チェック
     body('banned').optional({ nullable: true }).isBoolean().withMessage(MESSAGE_IS_BOOLEAN),
@@ -68,9 +68,9 @@ export const bulkDeleteValidator = [
     body('deleteTargetCardPageids').not().isEmpty().withMessage(MESSAGE_REQUIRED).custom(ids => {
         (ids as Array<any>).forEach(id => {
             if (!Number.isSafeInteger(id)) {
-                throw Error(MESSAGE_IS_INT)
+                throw Error(MESSAGE_IS_INT);
             }
         })
-        return true
+        return true;
     })
-]
+];

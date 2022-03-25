@@ -13,18 +13,18 @@ export async function findAllUsers() {
         accountDb.find({ $not: { deleted: true } }, { password: 0 }).sort("created").exec(function (errorOfFind: Error | null, accounts: Account[] | null) {
             if (errorOfFind) {
                 // 異常系
-                return reject(errorOfFind)
+                return reject(errorOfFind);
             }
 
             if (accounts == null) {
                 // 異常系
                 // todo: エラーメッセージ考える
-                return reject(new Error("ERROR: result accounts is null"))
+                return reject(new Error("ERROR: result accounts is null"));
             }
 
-            return resolve(accounts)
-        })
-    })
+            return resolve(accounts);
+        });
+    });
 }
 
 type UserChange = { targetId: string, banned: boolean } | { targetId: string, role: string }
@@ -33,14 +33,14 @@ export async function editUsers(changes: UserChange[]) {
     const promises = changes.map(change => 
         new Promise<void>((resolve: () => any, reject: (error: Error) => any) => {
 
-            const changeObject = 'role' in change ? { $set: { role: change.role } } : { $set: { banned: change.banned }}
+            const changeObject = 'role' in change ? { $set: { role: change.role } } : { $set: { banned: change.banned }};
             accountDb.update({ _id: change.targetId }, changeObject, {}, function(errorOfUpdate) {
                 if (errorOfUpdate) {
                     console.log(errorOfUpdate);
                     return reject(errorOfUpdate);
                 }
 
-                console.log("アカウント更新成功")
+                console.log("アカウント更新成功");
                 accountDb.persistence.compactDatafile();
                 return resolve();
             });
@@ -49,9 +49,9 @@ export async function editUsers(changes: UserChange[]) {
 
     // 権限変更したのでセッション破棄
     changes.forEach(change => {
-        sessionService.killSessionByUserId(change.targetId)
-    })
+        sessionService.killSessionByUserId(change.targetId);
+    });
 
-    return Promise.allSettled(promises)
+    return Promise.allSettled(promises);
 
 }
