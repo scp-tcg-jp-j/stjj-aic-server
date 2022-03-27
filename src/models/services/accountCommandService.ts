@@ -28,23 +28,6 @@ export async function accountCreate(username: string, email: string, password: s
     });
 }
 
-// メアド変更
-let emailChangeQueue: { currentEmail: string, newEmail: string, id: string }[] = [];
-export function emailChangeEnqueue(item: { currentEmail: string, newEmail: string, id: string}) {
-    emailChangeQueue.push(item);
-}
-
-export function emailChangeDeque(id: string) {
-    const item = emailChangeQueue.find(queueItem => queueItem.id == id);
-    if (item) {
-        // アイテム除去
-        emailChangeQueue = emailChangeQueue.filter(queueItem => queueItem.id != id);
-        return item;
-    } else {
-        return null;
-    }
-}
-
 export async function emailChange(targetEmail: string, newEmail: string) {
     return new Promise<void>((resolve: () => any, reject: (error: Error) => any) => {
         const query = {

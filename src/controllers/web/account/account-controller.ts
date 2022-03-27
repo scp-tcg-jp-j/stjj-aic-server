@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { logger } from '../../../logger';
-import { accountCreate, accountDelete, emailChange, emailChangeDeque, emailChangeEnqueue, passwordChange, passwordReset, passwordResetDeque, passwordResetEnqueue, signupDeque, signupEnqueue, usernameChange } from "../../../models/services/accountCommandService";
+import { accountCreate, accountDelete, emailChange, passwordChange, passwordReset, passwordResetDeque, passwordResetEnqueue, signupDeque, signupEnqueue, usernameChange } from "../../../models/services/accountCommandService";
 import { v4 as uuidv4 } from 'uuid';
 import { BASE_URL, BASE_URL_FRONT } from '../../..';
 import { accountDb } from '../../../dao';
 import { sessionService } from '../../../models/services/sessionService';
 import { validationResult, matchedData } from 'express-validator';
 import { sendMail } from '../../../models/services/sendMailService';
+import { addEmailChangeWaiting, removeEmailChangeWaiting } from '../../../models/services/emailChangeWaitingService';
 
 /**
 * ユーザ名変更
@@ -165,34 +166,34 @@ export function postEmailChange(req: Request, res: Response) {
     const token = uuidv4();
     const html = 'STJJ.AICのメールアドレス変更が申請されました。<br>正式にメールアドレス変更するには、次のリンクを押して新しいパスワードを登録していただく必要があります。<br><a href="' + BASE_URL_FRONT + '/#/email-change-new?token=' + token + '">STJJ.AIC メールアドレス変更</a><br>※本メールに心当たりのない場合はお手数ですが本メールの破棄をお願いします。';
 
-    emailChangeEnqueue({ currentEmail: (req.session as any).account.email, newEmail: req.body.email, id: token });
-
-    sendMail(req.body.email, 'STJJ.AIC メールアドレス変更手続き', html).then((sendMailResult) => {
-        if (sendMailResult.state == "ok") {
-            res.status(200).json({ result: "ok" }).send();
-            return;
-        }
-        logger.error(sendMailResult);
-        res.status(500).json({ result: "ng" }).send();
-    }).catch((reason) => {
+    addEmailChangeWaiting({ currentEmail: (req.session as any).account.email, newEmail: req.body.email, id: token })
+    .then(() => 
+        sendMail(req.body.email, 'STJJ.AIC メールアドレス変更手続き', html)
+        .then((sendMailResult) => {
+            if (sendMailResult.state == "ok") {
+                res.status(200).json({ result: "ok" }).send();
+                return;
+            }
+            throw Error("Mail failed.");
+        })
+    ).catch((reason) => {
         logger.error(reason);
         res.status(500).json({ result: "ng" }).send();
     });
 }
 
 export function postEmailChangeNew(req: Request, res: Response) {
-    const reserved = emailChangeDeque(req.body.token);
-    if (reserved) {
+    // メアド変更手続き中リストから当該の手続きを取得&リストから除去
+    removeEmailChangeWaiting(req.body.token)
+    .then((reserved) => 
         // 正式にDB登録
         emailChange(reserved.currentEmail, reserved.newEmail)
         .then(() => {
             (req.session as any).account.email = reserved.newEmail;
             res.status(200).json({ result: "ok" }).send();
-        }).catch(() => {
-            res.status(500).json({ result: "ng" }).send();
-        });
-    } else {
+        })
+    ).catch((reason) => {
         logger.error("トークンのマッチングに失敗");
         res.status(500).json({ result: "ng" }).send();
-    }
+    });
 }

@@ -19,14 +19,16 @@ export async function addEmailChangeWaiting(item: { currentEmail: string, newEma
 // メアド変更手続き中リストからの削除
 export async function removeEmailChangeWaiting(id: string) {
     return lock.acquire(key, function() {
-        if (!emailChangeWaitingList.some(item => item.id == id)) {
+        const reserved = emailChangeWaitingList.find(item => item.id == id);
+        if (!reserved) {
             throw new Error("id not matched.");
         }
         emailChangeWaitingList = emailChangeWaitingList.filter(item => item.id != id);
+        return reserved;
     });
 }
 
-// 既に手続き中か否か（これでチェックしてもぶつかるときはぶつかるので気休め程度のチェックにする）
+// 既に手続き中か否か（チェックしてもぶつかるときはぶつかるが、バリデータで使いたい。ないよりマシ）
 export function checkAlreadyExists(newEmail: string) {
     return emailChangeWaitingList.some(item => item.newEmail == newEmail);
 }
