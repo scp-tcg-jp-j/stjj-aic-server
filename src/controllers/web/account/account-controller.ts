@@ -144,6 +144,7 @@ export function postPasswordReset(req: Request, res: Response) {
 
 }
 
+// todo: セッションチェック
 export function postPasswordResetNew(req: Request, res: Response) {
     const reserved = passwordResetDeque(req.body.token);
     if (reserved) {
@@ -163,8 +164,16 @@ export function postPasswordResetNew(req: Request, res: Response) {
 
 export function postEmailChange(req: Request, res: Response) {
 
+    // バリデーション
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.warn(errors);
+        res.status(400).json({ errors: errors.array() }).send();
+        return;
+    }
+
     const token = uuidv4();
-    const html = 'STJJ.AICのメールアドレス変更が申請されました。<br>正式にメールアドレス変更するには、次のリンクを押して新しいパスワードを登録していただく必要があります。<br><a href="' + BASE_URL_FRONT + '/#/email-change-new?token=' + token + '">STJJ.AIC メールアドレス変更</a><br>※本メールに心当たりのない場合はお手数ですが本メールの破棄をお願いします。';
+    const html = 'STJJ.AICのメールアドレス変更が申請されました。<br>正式にメールアドレス変更するには、申請を出したブラウザで次のリンクを開いていただく必要があります。<br><a href="' + BASE_URL_FRONT + '/#/email-change-new?token=' + token + '">STJJ.AIC メールアドレス変更</a><br>※本メールに心当たりのない場合はお手数ですが本メールの破棄をお願いします。';
 
     addEmailChangeWaiting({ currentEmail: (req.session as any).account.email, newEmail: req.body.email, id: token })
     .then(() => 
@@ -185,14 +194,20 @@ export function postEmailChange(req: Request, res: Response) {
 export function postEmailChangeNew(req: Request, res: Response) {
     // メアド変更手続き中リストから当該の手続きを取得&リストから除去
     removeEmailChangeWaiting(req.body.token)
-    .then((reserved) => 
+    .then((reserved) => {
+        // セッションチェック
+        if (reserved.currentEmail != (req.session as any).account.email) {
+            return addEmailChangeWaiting(reserved).then(() => {
+                throw Error("Session unmatched.");
+            });
+        }
         // 正式にDB登録
-        emailChange(reserved.currentEmail, reserved.newEmail)
+        return emailChange(reserved.currentEmail, reserved.newEmail)
         .then(() => {
             (req.session as any).account.email = reserved.newEmail;
             res.status(200).json({ result: "ok" }).send();
-        })
-    ).catch((reason) => {
+        });
+    }).catch((reason) => {
         logger.error("トークンのマッチングに失敗");
         res.status(500).json({ result: "ng" }).send();
     });

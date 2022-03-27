@@ -1,4 +1,4 @@
-import { upsertPostSignupPasswordValidator, upsertPostSignupValidator } from './controllers/web/account/Validators';
+import { upsertPostEmailChangeValidator, upsertPostSignupPasswordValidator, upsertPostSignupValidator } from './controllers/web/account/Validators';
 import { Router } from 'express';
 import { postAccountDelete, postEmailChange, postEmailChangeNew, postPasswordChange, postPasswordReset, postPasswordResetNew, postSignup, postSignupPassword, postUsernameChange } from './controllers/web/account/account-controller';
 import { postAllUsers, postEditUsers } from './controllers/web/admin/UserManagerController';
@@ -29,7 +29,7 @@ export function configRoutes(router: Router) {
     router.post('/account_delete', postAccountDelete);
     router.post('/password_reset', postPasswordReset);
     router.post('/password_reset_new', postPasswordResetNew);
-    router.post('/email_change', postEmailChange);
+    router.post('/email_change',upsertPostEmailChangeValidator, postEmailChange);
     router.post('/email_change_new', postEmailChangeNew);
 
     // 管理者用ルート

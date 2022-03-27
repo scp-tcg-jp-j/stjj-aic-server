@@ -12,6 +12,7 @@ export const MESSAGE_MALFORMED_USERNAME = 'ユーザー名は半角英数字、�
 export const MESSAGE_USERNAME_ALREADY_USED = '既に利用されているユーザー名です';
 export const MESSAGE_IS_EMAIL = '不正なメールアドレス形式です';
 export const MESSAGE_EMAIL_ALREADY_USED = '既に利用されているメールアドレスです';
+export const MESSAGE_EMAIL_ALREADY_IN_PROGRESS = '既に変更手続き中のメールアドレスです。メールボックスを確認してください';
 export const MESSAGE_PASSWORD_LENGTH_MIN = 'パスワードは8文字以上で登録してください';
 export const MESSAGE_PASSWORD_USE_NUM = 'パスワードには半角数字を最低1文字入れてください';
 export const MESSAGE_PASSWORD_USE_ALPHABET = 'パスワードには半角英字を最低1文字入れてください';

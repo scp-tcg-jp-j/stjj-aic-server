@@ -1,6 +1,7 @@
-import { NG_USERNAMES, MESSAGE_NG_USERNAME, MESSAGE_IS_STRING, MESSAGE_MALFORMED_USERNAME, MESSAGE_REQUIRED, MESSAGE_IS_EMAIL, MESSAGE_PASSWORD_LENGTH_MIN, MESSAGE_PASSWORD_USE_NUM, MESSAGE_PASSWORD_USE_ALPHABET, MESSAGE_EMAIL_ALREADY_USED, MESSAGE_USERNAME_ALREADY_USED } from './../../../constants';
+import { NG_USERNAMES, MESSAGE_NG_USERNAME, MESSAGE_IS_STRING, MESSAGE_MALFORMED_USERNAME, MESSAGE_REQUIRED, MESSAGE_IS_EMAIL, MESSAGE_PASSWORD_LENGTH_MIN, MESSAGE_PASSWORD_USE_NUM, MESSAGE_PASSWORD_USE_ALPHABET, MESSAGE_EMAIL_ALREADY_USED, MESSAGE_USERNAME_ALREADY_USED, MESSAGE_EMAIL_ALREADY_IN_PROGRESS } from './../../../constants';
 import { body } from 'express-validator';
 import { findOneAccountByEmail, findOneAccountByUsername } from '../../../models/services/accountQueryService';
+import { checkAlreadyExists } from '../../../models/services/emailChangeWaitingService';
 
 export const upsertPostSignupValidator = [
     body('email').notEmpty().withMessage(MESSAGE_REQUIRED),
@@ -15,6 +16,16 @@ export const upsertPostSignupValidator = [
                     resolve();
                 }
             });
+        });
+    }),
+    // 手続き中チェック
+    body('email').custom(email => {
+        return new Promise<void>((resolve, reject) => {
+            if (checkAlreadyExists(email)) {
+                reject(MESSAGE_EMAIL_ALREADY_IN_PROGRESS);
+            } else {
+                resolve();
+            }
         });
     }),
     body('username').notEmpty().withMessage(MESSAGE_REQUIRED),
@@ -36,7 +47,6 @@ export const upsertPostSignupValidator = [
             });
         });
     }),
-    // todo: 登録手続き中でないことの確認（正式登録完了前に別の人が登録してしまうのを防止するため）
 ];
 
 export const upsertPostSignupPasswordValidator = [
@@ -46,4 +56,31 @@ export const upsertPostSignupPasswordValidator = [
     body('password').matches(/\d/).withMessage(MESSAGE_PASSWORD_USE_NUM),
     // パスワードに半角英字があるかチェック
     body('password').matches(/[A-Za-z]/).withMessage(MESSAGE_PASSWORD_USE_ALPHABET),
+];
+
+export const upsertPostEmailChangeValidator = [
+    body('email').notEmpty().withMessage(MESSAGE_REQUIRED),
+    body('email').isEmail().withMessage(MESSAGE_IS_EMAIL),
+    // メアド重複確認
+    body('email').custom(email => {
+        return new Promise<void>((resolve, reject) => {
+            findOneAccountByEmail(email).then(maybeAccount => {
+                if (maybeAccount) {
+                    reject(MESSAGE_EMAIL_ALREADY_USED);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }),
+    // 手続き中チェック
+    body('email').custom(email => {
+        return new Promise<void>((resolve, reject) => {
+            if (checkAlreadyExists(email)) {
+                reject(MESSAGE_EMAIL_ALREADY_IN_PROGRESS);
+            } else {
+                resolve();
+            }
+        });
+    }),
 ];

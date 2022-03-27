@@ -28,6 +28,7 @@ export async function accountCreate(username: string, email: string, password: s
     });
 }
 
+// メアド変更
 export async function emailChange(targetEmail: string, newEmail: string) {
     return new Promise<void>((resolve: () => any, reject: (error: Error) => any) => {
         const query = {
