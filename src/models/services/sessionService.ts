@@ -26,13 +26,11 @@ class SessionService {
     public reloadAccountForAllSessions(_id: string) {
         accountDb.findOne({ _id: _id }, { password: 0 }, (err: Error | null, account: Account | null) => {
             if (err) {
-                // todo: 異常系を考える
                 console.log(err);
                 return false;
             }
 
             if (account == null) {
-                // todo: 異常系を考える
                 console.log("account is null(sessionService)");
                 return false;
             }

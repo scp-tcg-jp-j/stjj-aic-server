@@ -15,7 +15,6 @@ export function getConfig(): ConfigType {
     }
 
     // todo: パスをコマンドライン引数から受け取れるようにする
-    // todo: 文字コードフリーにする
     // todo: パースエラーのハンドリング
     const raw = fs.readFileSync('/home/stjj-aic/saconfig.json', 'utf-8');
     config = JSON.parse(raw);

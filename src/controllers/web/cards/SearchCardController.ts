@@ -8,7 +8,6 @@ export function postFindCards(req: Request, res: Response) {
     // NeDB用のクエリ
     let rootAndQuery = [];
     // メインタイプ
-    // todo クエリに改善の余地があるかもしれない。配列のマッチについて調べること。
     let maintypesQuery = {
         $or: (req.body.maintypes as any[]).map(maintype => ({
             maintypes: { $elemMatch: maintype }
@@ -16,7 +15,6 @@ export function postFindCards(req: Request, res: Response) {
     };
     rootAndQuery.push(maintypesQuery);
     // サブタイプ（※未入力の場合は絞り込まない）
-    // todo クエリに改善の余地があるかもしれない。配列のマッチについて調べること。
     let subtypesQuery = {
         $or: (req.body.subtypes as any[]).map(subtype => ({
             subtypes: { $elemMatch: subtype }

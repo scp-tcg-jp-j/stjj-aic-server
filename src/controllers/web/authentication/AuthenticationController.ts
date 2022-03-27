@@ -39,7 +39,6 @@ export function postSession(req: Request, res: Response) {
         .then(account => {
             res.status(200).json({ alive: true, account: account }).send();
         }).catch(() => {
-            // todo: 異常系を考える
             res.status(200).json({ alive: false }).send();
         });
     } else {
@@ -50,7 +49,6 @@ export function postSession(req: Request, res: Response) {
 export function postLogout(req: Request, res: Response) {
     logger.info("postLogout called");
     req.session.destroy((err) => {
-        // todo: 異常系を考える
         res.status(200).json({ result: "ok" }).send();
     });
 }

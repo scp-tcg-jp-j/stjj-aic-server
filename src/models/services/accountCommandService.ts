@@ -100,7 +100,6 @@ export async function passwordChange(change: { targetId: string, currentPassword
             }
 
             if (account == null) {
-                // todo: 異常系
                 console.log("result null in passwordChange");
                 return reject(new Error("result null in passwordChange"));
             }

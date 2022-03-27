@@ -14,7 +14,6 @@ export async function currentCards() {
     );
 }
 
-// todo: コントローラ書いて繋げて動かしてみる
 // カード検索（まんまNeDBのクエリが動くのであまりよろしくない）
 export async function find(query: any, projection: any, sort: any, skip: number, limit: number) {
     return new Promise(

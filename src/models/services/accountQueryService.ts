@@ -1,8 +1,6 @@
 import { Account } from './../account';
 import { accountDb } from "../../dao";
-// todo: ユーザー系とサービスを統一する（実質同じものなので）
 
-// todo: 見付からない場合はエラーではなくnullを返すようにする
 export async function findOneAccount(_id: string) {
     return new Promise<Account>((resolve: (account: Account) => any, reject: (error: Error) => any) => {
         const query = {

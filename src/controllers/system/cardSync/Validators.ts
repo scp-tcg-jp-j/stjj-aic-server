@@ -26,7 +26,7 @@ export const upsertOneValidator = [
         assertsIsOc(oc);
         return true;
     }),
-    // todo: リザレクションがCanonではなくカノンで入ってくるので一旦切ってる
+    // リザレクションがCanonではなくカノンで入ってくるので一旦切ってる
     /*
     // メインタイプの必須・配列チェック・要素がSTJJのメインタイプかチェック
     body('maintypes').not().isEmpty().withMessage(MESSAGE_REQUIRED).isArray().withMessage(MESSAGE_IS_ARRAY).custom(maintypes => {

@@ -18,7 +18,6 @@ export async function findAllUsers() {
 
             if (accounts == null) {
                 // 異常系
-                // todo: エラーメッセージ考える
                 return reject(new Error("ERROR: result accounts is null"));
             }
 
