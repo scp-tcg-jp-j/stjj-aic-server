@@ -19,7 +19,6 @@ export async function login(loginInfo: LoginInfo) {
                         { username: loginInfo.usernameOrEmail },
                     ]
                 },
-                { banned: false },
                 { $not: { deleted: true } },
                 { $where: function () { return bcrypt.compareSync(loginInfo.password, (this as unknown as { password: string }).password ); } }
             ]

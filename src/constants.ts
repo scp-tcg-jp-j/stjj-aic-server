@@ -16,6 +16,8 @@ export const MESSAGE_EMAIL_ALREADY_IN_PROGRESS = '既に変更手続き中のメ
 export const MESSAGE_PASSWORD_LENGTH_MIN = 'パスワードは8文字以上で登録してください';
 export const MESSAGE_PASSWORD_USE_NUM = 'パスワードには半角数字を最低1文字入れてください';
 export const MESSAGE_PASSWORD_USE_ALPHABET = 'パスワードには半角英字を最低1文字入れてください';
+export const MESSAGE_BANNED_USER = 'あなたはBANされています。';
+export const MESSAGE_LOGIN_FAILED = 'ユーザー名、メールアドレスまたはパスワードが違います';
 
 export const SALT_ROUNDS = 10;
 
